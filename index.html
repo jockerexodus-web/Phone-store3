@@ -6,13 +6,24 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta name="description" content="Phone Store — La plateforme professionnelle de vente de téléphones. Achetez et vendez en toute confiance.">
+    <meta name="description" content="Phone Store — La plateforme professionnelle de vente de téléphones. Achetez, vendez et échangez en toute sécurité.">
     <meta name="theme-color" content="#0a3d7a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Phone Store">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a3d7a'/><text x='50' y='68' font-size='58' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>PS</text></svg>">
     <title>Phone Store — La plateforme pro des téléphones | 2026/2027</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
 </head>
 <body>
+
+    <!-- ============ TOP NOTIFICATION BAR ============ -->
+    <div class="top-bar" id="topBar">
+        <span class="top-bar-dot"></span>
+        <span id="topBarText">🔒 Plateforme sécurisée · Vérification d'identité obligatoire</span>
+        <button class="top-bar-close" onclick="PhoneStore.dismissTopBar()" aria-label="Fermer">×</button>
+    </div>
 
     <!-- ============ NAVBAR ============ -->
     <header class="navbar" id="navbar">
@@ -26,19 +37,26 @@
                 <a href="#" class="nav-link active" data-view="accueil" onclick="PhoneStore.navTo(event,'accueil')">Accueil</a>
                 <a href="#" class="nav-link" data-view="acheter" onclick="PhoneStore.navTo(event,'acheter')">Acheter</a>
                 <a href="#" class="nav-link" data-view="vendre" onclick="PhoneStore.navTo(event,'vendre')">Vendre</a>
+                <a href="#" class="nav-link" data-view="favoris" onclick="PhoneStore.navTo(event,'favoris')">
+                    Favoris <span class="badge-count" id="favBadge" style="display:none">0</span>
+                </a>
                 <a href="#" class="nav-link" data-view="messages" onclick="PhoneStore.navTo(event,'messages')">
                     Messages <span class="badge-count" id="unreadBadge" style="display:none">0</span>
+                </a>
+                <a href="#" class="nav-link" data-view="notifications" onclick="PhoneStore.navTo(event,'notifications')">
+                    <span style="font-size:18px">🔔</span>
+                    <span class="badge-count" id="notifBadge" style="display:none">0</span>
                 </a>
                 <a href="#" class="nav-link" data-view="compte" onclick="PhoneStore.navTo(event,'compte')">Mon compte</a>
             </nav>
 
             <div class="nav-actions">
+                <button class="btn-icon" onclick="PhoneStore.toggleTheme()" title="Changer de thème" id="themeBtn">🌙</button>
                 <button class="btn-outline" onclick="PhoneStore.openAuth('login')">Connexion</button>
                 <button class="btn-primary" onclick="PhoneStore.openAuth('register')">S'inscrire</button>
                 <button class="menu-toggle" onclick="PhoneStore.toggleMobileMenu()">☰</button>
             </div>
 
-            <!-- Menu compte connecté (caché par défaut) -->
             <div class="nav-user hidden" id="navUser">
                 <div class="nav-user-avatar" id="navUserAvatar">?</div>
                 <div class="nav-user-info">
@@ -49,6 +67,7 @@
                 <div class="user-menu" id="userMenu">
                     <button class="user-menu-item" onclick="PhoneStore.navTo(null,'compte')">👤 Mon compte</button>
                     <button class="user-menu-item" onclick="PhoneStore.navTo(null,'messages')">💬 Messages</button>
+                    <button class="user-menu-item" onclick="PhoneStore.navTo(null,'favoris')">❤️ Mes favoris</button>
                     <hr>
                     <button class="user-menu-item danger" onclick="PhoneStore.logout()">🚪 Déconnexion</button>
                 </div>
@@ -59,7 +78,6 @@
     <!-- ============ VUE ACCUEIL ============ -->
     <main id="view-accueil" class="view active">
 
-        <!-- Hero pro -->
         <section class="hero-pro">
             <div class="hero-pro-inner">
                 <div class="hero-left">
@@ -101,66 +119,37 @@
                                     <span class="ps-amount">1 250 000 FCFA</span>
                                 </div>
                                 <div class="ps-actions">
-                                    <div class="ps-action">
-                                        <div class="ps-action-icon">🛒</div>
-                                        <span>Acheter</span>
-                                    </div>
-                                    <div class="ps-action">
-                                        <div class="ps-action-icon">💰</div>
-                                        <span>Vendre</span>
-                                    </div>
-                                    <div class="ps-action">
-                                        <div class="ps-action-icon">💬</div>
-                                        <span>Chat</span>
-                                    </div>
+                                    <div class="ps-action"><div class="ps-action-icon">🛒</div><span>Acheter</span></div>
+                                    <div class="ps-action"><div class="ps-action-icon">💰</div><span>Vendre</span></div>
+                                    <div class="ps-action"><div class="ps-action-icon">💬</div><span>Chat</span></div>
                                 </div>
                             </div>
                         </div>
                         <div class="float-card float-1">
                             <div class="float-icon">✅</div>
-                            <div>
-                                <strong>Vendeur vérifié</strong>
-                                <span>Identité confirmée</span>
-                            </div>
+                            <div><strong>Vendeur vérifié</strong><span>Identité confirmée</span></div>
                         </div>
                         <div class="float-card float-2">
                             <div class="float-icon">💬</div>
-                            <div>
-                                <strong>Nouveau message</strong>
-                                <span>Alex M. · à l'instant</span>
-                            </div>
+                            <div><strong>Nouveau message</strong><span>Alex M. · à l'instant</span></div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Stats -->
         <section class="stats-strip">
             <div class="stats-inner">
-                <div class="stat-item">
-                    <div class="stat-num" data-target="18500">0</div>
-                    <div class="stat-lbl">Transactions réussies</div>
-                </div>
+                <div class="stat-item"><div class="stat-num" data-target="18500">0</div><div class="stat-lbl">Transactions réussies</div></div>
                 <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-num" data-target="4200">0</div>
-                    <div class="stat-lbl">Utilisateurs actifs</div>
-                </div>
+                <div class="stat-item"><div class="stat-num" data-target="4200">0</div><div class="stat-lbl">Utilisateurs actifs</div></div>
                 <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-num" data-target="98">0</div>
-                    <div class="stat-lbl">% Satisfaction</div>
-                </div>
+                <div class="stat-item"><div class="stat-num" data-target="98">0</div><div class="stat-lbl">% Satisfaction</div></div>
                 <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-num" data-target="24">0</div>
-                    <div class="stat-lbl">h Support moyen</div>
-                </div>
+                <div class="stat-item"><div class="stat-num" data-target="24">0</div><div class="stat-lbl">h Support moyen</div></div>
             </div>
         </section>
 
-        <!-- Comment ça marche -->
         <section class="section how-section">
             <div class="section-inner">
                 <div class="section-head">
@@ -168,7 +157,6 @@
                     <h2 class="section-title">Simple, rapide, sécurisé</h2>
                     <p class="section-sub">Trois étapes suffisent pour acheter ou vendre votre téléphone.</p>
                 </div>
-
                 <div class="steps">
                     <div class="step">
                         <div class="step-num">01</div>
@@ -192,50 +180,23 @@
             </div>
         </section>
 
-        <!-- Avantages -->
         <section class="section features-section">
             <div class="section-inner">
                 <div class="section-head">
                     <div class="section-eyebrow">Pourquoi Phone Store</div>
                     <h2 class="section-title">Une plateforme pensée pour vous</h2>
                 </div>
-
                 <div class="features-grid">
-                    <div class="feature">
-                        <div class="feature-icon">🔐</div>
-                        <h3>Sécurité maximale</h3>
-                        <p>Vérification d'identité, chiffrement des échanges et protection des paiements.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">💬</div>
-                        <h3>Messagerie intégrée</h3>
-                        <p>Discutez directement avec les autres utilisateurs, en temps réel.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">💵</div>
-                        <h3>Prix en FCFA</h3>
-                        <p>Tous les tarifs sont affichés en Franc CFA, pour plus de clarté.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">🏆</div>
-                        <h3>Vendeurs certifiés</h3>
-                        <p>Chaque vendeur est vérifié par notre équipe avant publication.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">🚀</div>
-                        <h3>Rapide et moderne</h3>
-                        <p>Interface fluide, rapide, optimisée pour tous les appareils.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">📞</div>
-                        <h3>Support 24/7</h3>
-                        <p>Notre équipe est disponible à tout moment pour vous accompagner.</p>
-                    </div>
+                    <div class="feature"><div class="feature-icon">🔐</div><h3>Sécurité maximale</h3><p>Vérification d'identité, chiffrement des échanges et protection des paiements.</p></div>
+                    <div class="feature"><div class="feature-icon">💬</div><h3>Messagerie intégrée</h3><p>Discutez directement avec les autres utilisateurs, en temps réel.</p></div>
+                    <div class="feature"><div class="feature-icon">💵</div><h3>Prix en FCFA</h3><p>Tous les tarifs sont affichés en Franc CFA, pour plus de clarté.</p></div>
+                    <div class="feature"><div class="feature-icon">🏆</div><h3>Vendeurs certifiés</h3><p>Chaque vendeur est vérifié par notre équipe avant publication.</p></div>
+                    <div class="feature"><div class="feature-icon">🚀</div><h3>Rapide et moderne</h3><p>Interface fluide, rapide, optimisée pour tous les appareils.</p></div>
+                    <div class="feature"><div class="feature-icon">📞</div><h3>Support 24/7</h3><p>Notre équipe est disponible à tout moment pour vous accompagner.</p></div>
                 </div>
             </div>
         </section>
 
-        <!-- CTA -->
         <section class="cta-pro">
             <div class="cta-pro-inner">
                 <h2>Rejoignez Phone Store aujourd'hui</h2>
@@ -263,7 +224,6 @@
                     <h3>Filtres</h3>
                     <button class="link-btn" onclick="PhoneStore.resetFilters()">Réinitialiser</button>
                 </div>
-
                 <div class="filter-block">
                     <label for="brandFilter">Marque</label>
                     <select id="brandFilter" onchange="PhoneStore.applyFilters()">
@@ -278,7 +238,6 @@
                         <option value="Autre">Autre</option>
                     </select>
                 </div>
-
                 <div class="filter-block">
                     <label>Prix (FCFA)</label>
                     <div class="range-inputs">
@@ -287,7 +246,6 @@
                         <input type="number" id="maxPrice" placeholder="Max" min="0" onchange="PhoneStore.applyFilters()">
                     </div>
                 </div>
-
                 <div class="filter-block">
                     <label>État</label>
                     <label class="check-row"><input type="checkbox" class="conditionFilter" value="Neuf" onchange="PhoneStore.applyFilters()"> Neuf</label>
@@ -309,7 +267,6 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="catalog-grid" id="catalogGrid"></div>
             </div>
         </div>
@@ -330,11 +287,9 @@
                 <p class="sell-desc">Remplissez les informations ci-dessous. Votre annonce sera visible immédiatement par les acheteurs.</p>
 
                 <form id="sellForm" onsubmit="PhoneStore.publishProduct(event)" novalidate>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pTitle">Titre *</label>
-                            <input type="text" id="pTitle" required maxlength="100" placeholder="Ex : iPhone 14 Pro 256Go">
-                        </div>
+                    <div class="form-group">
+                        <label for="pTitle">Titre *</label>
+                        <input type="text" id="pTitle" required maxlength="100" placeholder="Ex : iPhone 14 Pro 256Go">
                     </div>
 
                     <div class="form-row-2">
@@ -354,7 +309,7 @@
                         </div>
                         <div class="form-group">
                             <label for="pPrice">Prix (FCFA) *</label>
-                            <input type="number" id="pPrice" required min="1000" max="10000000" step="500" placeholder="Ex : 350000">
+                            <input type="number" id="pPrice" required min="1000" max="10000000" step="500" placeholder="350000">
                         </div>
                     </div>
 
@@ -375,6 +330,12 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="pImage">Photo du téléphone</label>
+                        <input type="file" id="pImage" accept="image/*" onchange="PhoneStore.previewImage(event)">
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+
+                    <div class="form-group">
                         <label for="pDescription">Description</label>
                         <textarea id="pDescription" maxlength="600" placeholder="Décrivez votre téléphone (accessoires, garantie, défauts éventuels...)"></textarea>
                     </div>
@@ -386,14 +347,21 @@
             <div class="my-listings-card">
                 <h2>Mes annonces publiées</h2>
                 <p class="sell-desc">Gérez vos annonces actives ci-dessous.</p>
-
-                <div class="my-listings" id="myListings">
-                    <div class="empty-state">
-                        <div class="empty-icon">📦</div>
-                        <p>Aucune annonce publiée pour le moment.</p>
-                    </div>
-                </div>
+                <div class="my-listings" id="myListings"></div>
             </div>
+        </div>
+    </main>
+
+    <!-- ============ VUE FAVORIS ============ -->
+    <main id="view-favoris" class="view">
+        <div class="page-header">
+            <div class="page-header-inner">
+                <h1>❤️ Mes favoris</h1>
+                <p>Retrouvez les téléphones que vous avez sauvegardés.</p>
+            </div>
+        </div>
+        <div class="container-simple">
+            <div class="catalog-grid" id="favGrid"></div>
         </div>
     </main>
 
@@ -410,7 +378,7 @@
                 <div class="conv-list" id="convList"></div>
             </aside>
 
-            <section class="chat-panel" id="chatPanel">
+            <section class="chat-panel">
                 <div class="chat-header">
                     <div class="chat-user">
                         <div class="chat-avatar" id="chatAvatar">?</div>
@@ -436,6 +404,19 @@
         </div>
     </main>
 
+    <!-- ============ VUE NOTIFICATIONS ============ -->
+    <main id="view-notifications" class="view">
+        <div class="page-header">
+            <div class="page-header-inner">
+                <h1>🔔 Notifications</h1>
+                <p>Restez informé de l'actualité de votre compte.</p>
+            </div>
+        </div>
+        <div class="container-simple">
+            <div class="notifs-list" id="notifsList"></div>
+        </div>
+    </main>
+
     <!-- ============ VUE COMPTE ============ -->
     <main id="view-compte" class="view">
         <div class="page-header">
@@ -451,47 +432,42 @@
                 <h2 id="profileName">—</h2>
                 <p id="profileEmail">—</p>
                 <span class="profile-role-badge" id="profileRole">—</span>
-
-                <button class="btn-outline full" onclick="PhoneStore.logout()">Se déconnecter</button>
+                <div id="verifiedBadge"></div>
+                <button class="btn-outline full" style="margin-top:14px" onclick="PhoneStore.logout()">Se déconnecter</button>
             </div>
 
             <div class="account-content">
                 <div class="account-card">
                     <h3>Informations personnelles</h3>
-                    <div class="info-row">
-                        <span>Nom complet</span>
-                        <strong id="infoName">—</strong>
-                    </div>
-                    <div class="info-row">
-                        <span>Email</span>
-                        <strong id="infoEmail">—</strong>
-                    </div>
-                    <div class="info-row">
-                        <span>Téléphone</span>
-                        <strong id="infoPhone">—</strong>
-                    </div>
-                    <div class="info-row">
-                        <span>Membre depuis</span>
-                        <strong id="infoSince">—</strong>
-                    </div>
+                    <div class="info-row"><span>Nom complet</span><strong id="infoName">—</strong></div>
+                    <div class="info-row"><span>Email</span><strong id="infoEmail">—</strong></div>
+                    <div class="info-row"><span>Téléphone</span><strong id="infoPhone">—</strong></div>
+                    <div class="info-row"><span>Membre depuis</span><strong id="infoSince">—</strong></div>
                 </div>
 
                 <div class="account-card">
                     <h3>Mes statistiques</h3>
                     <div class="stats-grid-mini">
-                        <div class="stat-mini">
-                            <div class="stat-mini-value" id="statListings">0</div>
-                            <div class="stat-mini-label">Annonces publiées</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-value" id="statMessages">0</div>
-                            <div class="stat-mini-label">Messages envoyés</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-value" id="statSales">0</div>
-                            <div class="stat-mini-label">Ventes réalisées</div>
-                        </div>
+                        <div class="stat-mini"><div class="stat-mini-value" id="statListings">0</div><div class="stat-mini-label">Annonces publiées</div></div>
+                        <div class="stat-mini"><div class="stat-mini-value" id="statMessages">0</div><div class="stat-mini-label">Messages envoyés</div></div>
+                        <div class="stat-mini"><div class="stat-mini-value" id="statFavorites">0</div><div class="stat-mini-label">Favoris</div></div>
                     </div>
+                </div>
+
+                <div class="account-card">
+                    <h3>Préférences</h3>
+                    <label class="check-row" style="justify-content:space-between;">
+                        <span>🌙 Mode sombre</span>
+                        <input type="checkbox" id="darkModeToggle" onchange="PhoneStore.toggleTheme()">
+                    </label>
+                    <label class="check-row" style="justify-content:space-between;">
+                        <span>🔔 Notifications push</span>
+                        <input type="checkbox" id="pushToggle" checked>
+                    </label>
+                    <label class="check-row" style="justify-content:space-between;">
+                        <span>📧 Emails marketing</span>
+                        <input type="checkbox" id="emailToggle">
+                    </label>
                 </div>
             </div>
         </div>
@@ -519,6 +495,9 @@
                 <div class="form-group">
                     <label for="loginPassword">Mot de passe</label>
                     <input type="password" id="loginPassword" required minlength="6" maxlength="60" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div style="text-align:right;margin-bottom:14px;">
+                    <a href="#" onclick="PhoneStore.resetPassword(event);return false;" style="font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:600;">Mot de passe oublié ?</a>
                 </div>
 
                 <button type="submit" class="btn-primary full">Se connecter</button>
@@ -563,6 +542,43 @@
                 <button type="submit" class="btn-primary full">Créer mon compte</button>
                 <p class="auth-switch">Déjà inscrit ? <a href="#" onclick="PhoneStore.switchAuthTab('login');return false;">Se connecter</a></p>
             </form>
+        </div>
+    </div>
+
+    <!-- ============ PAYMENT MODAL ============ -->
+    <div class="auth-overlay" id="paymentOverlay">
+        <div class="auth-modal">
+            <button class="auth-close" onclick="PhoneStore.closePayment()">&times;</button>
+            <h2>💳 Confirmer l'achat</h2>
+            <p class="auth-sub" id="paymentSubtitle">—</p>
+
+            <div class="payment-summary" id="paymentSummary"></div>
+
+            <div class="payment-methods">
+                <label class="pay-method">
+                    <input type="radio" name="payMethod" value="orange" checked>
+                    <span>🟠 Orange Money</span>
+                </label>
+                <label class="pay-method">
+                    <input type="radio" name="payMethod" value="mtn">
+                    <span>🟡 MTN Mobile Money</span>
+                </label>
+                <label class="pay-method">
+                    <input type="radio" name="payMethod" value="wave">
+                    <span>🌊 Wave</span>
+                </label>
+                <label class="pay-method">
+                    <input type="radio" name="payMethod" value="card">
+                    <span>💳 Carte bancaire</span>
+                </label>
+            </div>
+
+            <button class="btn-primary full" onclick="PhoneStore.confirmPayment()" style="margin-top:16px;">
+                Payer maintenant
+            </button>
+            <p style="font-size:12px;color:var(--text-3);text-align:center;margin-top:12px;">
+                🔒 Transaction sécurisée · Remboursement 30 jours
+            </p>
         </div>
     </div>
 
