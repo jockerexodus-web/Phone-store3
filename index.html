@@ -6,107 +6,372 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta name="description" content="Phone Store - Achetez et vendez des téléphones en ligne en toute sécurité. Créé par Waze Studio.">
+    <meta name="description" content="Phone Store — Marketplace pro de téléphones. Espace vendeurs, espace clients, messagerie intégrée. Créé par Waze Studio.">
     <meta name="theme-color" content="#0a66c2">
-    <title>Phone Store — Acheter & Vendre des téléphones</title>
+    <title>Phone Store — Marketplace pro | Waze Studio</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
 </head>
 <body>
 
-    <!-- En-tête -->
-    <header class="navbar">
+    <!-- ============ NAVBAR ============ -->
+    <header class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="#" class="logo" aria-label="Phone Store accueil">
+            <a href="#" class="logo" data-view="accueil">
                 <span class="logo-icon">📱</span>
                 <span class="logo-text">Phone<strong>Store</strong></span>
             </a>
 
-            <div class="search-bar" role="search">
-                <input type="search" id="searchInput" placeholder="Rechercher un téléphone..." aria-label="Rechercher" autocomplete="off" maxlength="80">
-                <button type="button" aria-label="Rechercher" onclick="PhoneStore.applyFilters()">🔍</button>
+            <nav class="nav-menu" aria-label="Menu principal">
+                <a href="#" class="nav-link active" data-view="accueil">Accueil</a>
+                <a href="#" class="nav-link" data-view="clients">🛒 Boutique</a>
+                <a href="#" class="nav-link" data-view="vendeurs">🏪 Espace vendeur</a>
+                <a href="#" class="nav-link" data-view="messages">💬 Messagerie <span class="badge-count" id="unreadBadge" style="display:none">0</span></a>
+            </nav>
+
+            <div class="nav-actions">
+                <button class="nav-btn" id="userBtn" onclick="PhoneStore.toggleUserMenu()" title="Mon compte">
+                    <span class="user-avatar-nav">👤</span>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
             </div>
 
-            <nav class="nav-icons" aria-label="Navigation principale">
-                <button class="nav-btn" onclick="PhoneStore.scrollToListings()" title="Annonces">🏪</button>
-                <button class="nav-btn" onclick="PhoneStore.toggleFavoritesView()" title="Favoris">❤️</button>
-                <button class="btn-primary" onclick="PhoneStore.openModal()">+ Vendre</button>
-            </nav>
+            <!-- Menu utilisateur -->
+            <div class="user-menu" id="userMenu">
+                <div class="user-menu-header">
+                    <div class="user-avatar-large" id="userAvatarLarge">👤</div>
+                    <div>
+                        <strong id="userNameDisplay">Invité</strong>
+                        <span id="userRoleDisplay">Non connecté</span>
+                    </div>
+                </div>
+                <hr>
+                <button class="user-menu-item" onclick="PhoneStore.switchRole('client')">
+                    🛒 Espace client
+                </button>
+                <button class="user-menu-item" onclick="PhoneStore.switchRole('vendeur')">
+                    🏪 Espace vendeur
+                </button>
+                <hr>
+                <button class="user-menu-item" onclick="PhoneStore.logout()">
+                    🚪 Déconnexion
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Bandeau sécurité -->
-    <div class="security-banner">
-        🔒 Paiement sécurisé · Vérification des vendeurs · Protection acheteur
-    </div>
+    <!-- ============ VUE ACCUEIL ============ -->
+    <main id="view-accueil" class="view active">
+        <section class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <div class="hero-badge">✨ Waze Studio 2025</div>
+                <h1 class="hero-title">
+                    La marketplace <span class="gradient-text">professionnelle</span><br>
+                    des téléphones en France
+                </h1>
+                <p class="hero-subtitle">
+                    Achetez, vendez et collaborez avec les plus grandes marques.
+                    Espaces dédiés pour vendeurs et clients, messagerie intégrée.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn-hero-primary" onclick="PhoneStore.switchView('clients')">
+                        🛒 Explorer la boutique
+                    </button>
+                    <button class="btn-hero-secondary" onclick="PhoneStore.switchView('vendeurs')">
+                        🏪 Espace vendeur
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><div class="stat-value" data-target="12500">0</div><div class="stat-label">Téléphones vendus</div></div>
+                    <div class="stat"><div class="stat-value" data-target="48">0</div><div class="stat-label">Marques partenaires</div></div>
+                    <div class="stat"><div class="stat-value" data-target="99">0</div><div class="stat-label">% Satisfaction</div></div>
+                    <div class="stat"><div class="stat-value" data-target="24">0</div><div class="stat-label">h Support moyen</div></div>
+                </div>
+            </div>
+        </section>
 
-    <!-- Contenu principal -->
-    <div class="container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h3>Filtres</h3>
+        <section class="trust-bar">
+            <div class="trust-container">
+                <div class="trust-item"><span class="trust-icon">🔒</span><span>Paiement sécurisé</span></div>
+                <div class="trust-item"><span class="trust-icon">✅</span><span>Vendeurs vérifiés</span></div>
+                <div class="trust-item"><span class="trust-icon">🚚</span><span>Livraison suivie</span></div>
+                <div class="trust-item"><span class="trust-icon">↩️</span><span>Retour 30 jours</span></div>
+                <div class="trust-item"><span class="trust-icon">🏆</span><span>Garantie 24 mois</span></div>
+            </div>
+        </section>
 
-            <div class="filter-group">
-                <label for="brandFilter">Marque</label>
-                <select id="brandFilter" onchange="PhoneStore.applyFilters()">
-                    <option value="">Toutes les marques</option>
-                    <option value="Apple">Apple</option>
-                    <option value="Samsung">Samsung</option>
-                    <option value="Xiaomi">Xiaomi</option>
-                    <option value="Google">Google</option>
-                    <option value="OnePlus">OnePlus</option>
-                    <option value="Huawei">Huawei</option>
-                    <option value="Autre">Autre</option>
-                </select>
+        <section class="section services-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">⚡ 3 espaces dédiés</span>
+                    <h2 class="section-title">Un espace pour chaque besoin</h2>
+                    <p class="section-desc">Que vous soyez acheteur ou vendeur, Phone Store vous offre un environnement sur mesure.</p>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card" onclick="PhoneStore.switchView('clients')">
+                        <div class="service-icon">🛒</div>
+                        <h3>Espace client</h3>
+                        <p>Parcourez le catalogue, ajoutez aux favoris, commandez en toute sécurité et suivez vos livraisons.</p>
+                        <span class="service-link">Accéder →</span>
+                    </div>
+                    <div class="service-card" onclick="PhoneStore.switchView('vendeurs')">
+                        <div class="service-icon">🏪</div>
+                        <h3>Espace vendeur</h3>
+                        <p>Gérez votre catalogue, vos stocks, vos commandes et vos statistiques depuis un tableau de bord pro.</p>
+                        <span class="service-link">Accéder →</span>
+                    </div>
+                    <div class="service-card" onclick="PhoneStore.switchView('messages')">
+                        <div class="service-icon">💬</div>
+                        <h3>Messagerie</h3>
+                        <p>Discutez en temps réel avec vos clients ou vendeurs, négociez et concluez vos ventes en direct.</p>
+                        <span class="service-link">Ouvrir →</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section brands-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">🤝 Partenaires officiels</span>
+                    <h2 class="section-title">Nos marques partenaires</h2>
+                </div>
+                <div class="brands-grid">
+                    <div class="brand-card"><div class="brand-logo">🍎</div><h3>Apple</h3><p>Partenaire premium</p></div>
+                    <div class="brand-card"><div class="brand-logo">📱</div><h3>Samsung</h3><p>Certifié Galaxy</p></div>
+                    <div class="brand-card"><div class="brand-logo">⚡</div><h3>Xiaomi</h3><p>Distributeur officiel</p></div>
+                    <div class="brand-card"><div class="brand-logo">🔍</div><h3>Google</h3><p>Partenaire Pixel</p></div>
+                    <div class="brand-card"><div class="brand-logo">1️⃣</div><h3>OnePlus</h3><p>Vente certifiée</p></div>
+                    <div class="brand-card"><div class="brand-logo">🌸</div><h3>Huawei</h3><p>B2B & B2C</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-final">
+            <div class="cta-content">
+                <h2>Prêt à rejoindre la révolution Phone Store ?</h2>
+                <p>Rejoignez plus de 12 000 utilisateurs et 48 partenaires officiels.</p>
+                <button class="btn-cta" onclick="PhoneStore.switchView('clients')">Découvrir la boutique →</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============ VUE CLIENTS (Boutique) ============ -->
+    <main id="view-clients" class="view">
+        <div class="container">
+            <aside class="sidebar">
+                <h3>Filtres</h3>
+
+                <div class="filter-group">
+                    <label for="brandFilter">Marque</label>
+                    <select id="brandFilter" onchange="PhoneStore.applyFilters()">
+                        <option value="">Toutes les marques</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Xiaomi">Xiaomi</option>
+                        <option value="Google">Google</option>
+                        <option value="OnePlus">OnePlus</option>
+                        <option value="Huawei">Huawei</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Prix (€)</label>
+                    <div class="price-range">
+                        <input type="number" id="minPrice" placeholder="Min" min="0" max="10000" onchange="PhoneStore.applyFilters()">
+                        <span>—</span>
+                        <input type="number" id="maxPrice" placeholder="Max" min="0" max="10000" onchange="PhoneStore.applyFilters()">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>État</label>
+                    <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Neuf" onchange="PhoneStore.applyFilters()"> Neuf</label>
+                    <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Comme neuf" onchange="PhoneStore.applyFilters()"> Comme neuf</label>
+                    <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Bon état" onchange="PhoneStore.applyFilters()"> Bon état</label>
+                </div>
+
+                <button class="btn-secondary full-width" onclick="PhoneStore.resetFilters()">Réinitialiser</button>
+            </aside>
+
+            <div class="main-content">
+                <div class="listings-header">
+                    <h2 id="resultsCount">Boutique</h2>
+                    <div class="search-bar-inline">
+                        <input type="search" id="searchInput" placeholder="Rechercher..." maxlength="80">
+                    </div>
+                    <select id="sortFilter" onchange="PhoneStore.applyFilters()">
+                        <option value="recent">Plus récentes</option>
+                        <option value="price-asc">Prix croissant</option>
+                        <option value="price-desc">Prix décroissant</option>
+                    </select>
+                </div>
+                <div class="listings-grid" id="listingsGrid"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============ VUE VENDEURS (Dashboard) ============ -->
+    <main id="view-vendeurs" class="view">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h1>🏪 Tableau de bord vendeur</h1>
+                    <p>Gérez votre boutique, vos produits et vos commandes.</p>
+                </div>
+                <button class="btn-primary" onclick="PhoneStore.openModal()">+ Ajouter un produit</button>
             </div>
 
-            <div class="filter-group">
-                <label>Prix (€)</label>
-                <div class="price-range">
-                    <input type="number" id="minPrice" placeholder="Min" min="0" max="10000" onchange="PhoneStore.applyFilters()" inputmode="numeric">
-                    <span>—</span>
-                    <input type="number" id="maxPrice" placeholder="Max" min="0" max="10000" onchange="PhoneStore.applyFilters()" inputmode="numeric">
+            <!-- KPI -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon">📦</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Produits actifs</span>
+                        <span class="kpi-value" id="kpiProducts">0</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Revenu total</span>
+                        <span class="kpi-value" id="kpiRevenue">0 €</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🛒</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Commandes</span>
+                        <span class="kpi-value" id="kpiOrders">0</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">⭐</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Note moyenne</span>
+                        <span class="kpi-value" id="kpiRating">4.8</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <label>État</label>
-                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Neuf" onchange="PhoneStore.applyFilters()"> Neuf</label>
-                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Comme neuf" onchange="PhoneStore.applyFilters()"> Comme neuf</label>
-                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Bon état" onchange="PhoneStore.applyFilters()"> Bon état</label>
-                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Correct" onchange="PhoneStore.applyFilters()"> Correct</label>
+            <!-- Onglets -->
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="products" onclick="PhoneStore.switchTab('products')">📦 Mes produits</button>
+                <button class="tab-btn" data-tab="orders" onclick="PhoneStore.switchTab('orders')">🛒 Commandes</button>
+                <button class="tab-btn" data-tab="customers" onclick="PhoneStore.switchTab('customers')">👥 Clients</button>
             </div>
 
-            <button class="btn-secondary full-width" onclick="PhoneStore.resetFilters()">Réinitialiser</button>
-        </aside>
-
-        <!-- Annonces -->
-        <main class="main-content">
-            <div class="listings-header">
-                <h2 id="resultsCount">Annonces récentes</h2>
-                <select id="sortFilter" onchange="PhoneStore.applyFilters()" aria-label="Trier par">
-                    <option value="recent">Plus récentes</option>
-                    <option value="price-asc">Prix croissant</option>
-                    <option value="price-desc">Prix décroissant</option>
-                </select>
+            <!-- Contenu onglets -->
+            <div class="tab-content active" id="tab-products">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Marque</th>
+                                <th>Prix</th>
+                                <th>État</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTable"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="listings-grid" id="listingsGrid" role="list"></div>
-        </main>
-    </div>
+            <div class="tab-content" id="tab-orders">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Commande</th>
+                                <th>Client</th>
+                                <th>Produit</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable"></tbody>
+                    </table>
+                </div>
+            </div>
 
-    <!-- Modal ajout annonce -->
-    <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="tab-content" id="tab-customers">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Email</th>
+                                <th>Commandes</th>
+                                <th>Total dépensé</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============ VUE MESSAGERIE (Messenger-like) ============ -->
+    <main id="view-messages" class="view">
+        <div class="messenger">
+            <!-- Sidebar conversations -->
+            <aside class="messenger-sidebar">
+                <div class="messenger-header">
+                    <h2>💬 Messages</h2>
+                    <button class="icon-btn" title="Nouvelle conversation">✏️</button>
+                </div>
+                <div class="messenger-search">
+                    <input type="search" id="convSearch" placeholder="Rechercher une conversation...">
+                </div>
+                <div class="conversations" id="conversationsList"></div>
+            </aside>
+
+            <!-- Zone chat -->
+            <section class="messenger-chat">
+                <div class="chat-header" id="chatHeader">
+                    <div class="chat-user">
+                        <div class="chat-avatar" id="chatAvatar">?</div>
+                        <div>
+                            <strong id="chatName">Sélectionnez une conversation</strong>
+                            <span id="chatStatus" class="chat-status">En ligne</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-empty">
+                        <div class="chat-empty-icon">💬</div>
+                        <p>Choisissez une conversation pour commencer</p>
+                    </div>
+                </div>
+
+                <form class="chat-input-bar" id="chatForm" onsubmit="PhoneStore.sendMessage(event)">
+                    <input type="text" id="chatInput" placeholder="Écrivez un message..." autocomplete="off" maxlength="500" disabled>
+                    <button type="button" class="icon-btn" title="Emoji">😊</button>
+                    <button type="submit" class="btn-send" disabled id="sendBtn">➤</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <!-- ============ MODAL Ajouter produit ============ -->
+    <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
         <div class="modal">
             <button class="modal-close" onclick="PhoneStore.closeModal()" aria-label="Fermer">&times;</button>
-            <h2 id="modalTitle">Vendre un téléphone</h2>
+            <h2 id="modalTitle">Ajouter un produit</h2>
+            <p class="modal-desc">Remplissez les informations de votre téléphone à vendre.</p>
 
-            <form id="sellForm" onsubmit="PhoneStore.addListing(event)" novalidate>
+            <form id="productForm" onsubmit="PhoneStore.addProduct(event)" novalidate>
                 <div class="form-group">
-                    <label for="title">Titre de l'annonce *</label>
-                    <input type="text" id="title" required maxlength="100" placeholder="Ex : iPhone 13 Pro 256Go" autocomplete="off">
+                    <label for="title">Titre *</label>
+                    <input type="text" id="title" required maxlength="100" placeholder="Ex : iPhone 13 Pro 256Go">
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label for="brand">Marque *</label>
@@ -118,16 +383,13 @@
                             <option value="Google">Google</option>
                             <option value="OnePlus">OnePlus</option>
                             <option value="Huawei">Huawei</option>
-                            <option value="Autre">Autre</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="price">Prix (€) *</label>
-                        <input type="number" id="price" required min="0" max="10000" step="1" placeholder="450" inputmode="numeric">
+                        <input type="number" id="price" required min="1" max="10000" placeholder="450">
                     </div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label for="condition">État *</label>
@@ -135,37 +397,31 @@
                             <option value="Neuf">Neuf</option>
                             <option value="Comme neuf">Comme neuf</option>
                             <option value="Bon état">Bon état</option>
-                            <option value="Correct">Correct</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="location">Localisation *</label>
-                        <input type="text" id="location" required maxlength="60" placeholder="Paris, 75001" autocomplete="off">
+                        <input type="text" id="location" required maxlength="60" placeholder="Paris, 75001">
                     </div>
                 </div>
-
+                <div class="form-group">
+                    <label for="stock">Stock disponible *</label>
+                    <input type="number" id="stock" required min="1" max="999" value="1">
+                </div>
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea id="description" maxlength="500" placeholder="Décrivez votre téléphone (état, accessoires, garantie…)"></textarea>
+                    <textarea id="description" maxlength="500" placeholder="Décrivez votre produit..."></textarea>
                 </div>
-
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="PhoneStore.closeModal()">Annuler</button>
-                    <button type="submit" class="btn-primary">Publier l'annonce</button>
+                    <button type="submit" class="btn-primary">Publier</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Notification -->
+    <!-- ============ TOAST ============ -->
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-    <!-- Pied de page -->
-    <footer class="footer">
-        <p>© 2025 <strong>Phone Store</strong> — Créé par <strong>Waze Studio</strong></p>
-        <p class="footer-sub">🔒 Site sécurisé · HTTPS · Protection des données</p>
-    </footer>
 
     <script src="script.js" defer></script>
 </body>
