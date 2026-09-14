@@ -1,0 +1,19 @@
+{
+  "name": "Phone Store — Plateforme pro des téléphones",
+  "short_name": "Phone Store",
+  "description": "Achetez et vendez vos téléphones en toute confiance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a3d7a",
+  "theme_color": "#0a3d7a",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='90' fill='%230a3d7a'/><text x='256' y='340' font-size='240' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>PS</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+    }
