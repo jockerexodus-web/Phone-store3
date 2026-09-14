@@ -1446,4 +1446,239 @@ body { background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font
     .stats-grid-mini { grid-template-columns: 1fr; }
 
     .auth-modal { padding: 24px 20px; }
+}/* ============ AJOUTS VERSION ULTIME ============ */
+
+/* Top bar */
+.top-bar {
+    background: var(--primary);
+    color: white;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
 }
+
+.top-bar-dot {
+    width: 7px; height: 7px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.top-bar-close {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 6px;
+}
+
+.top-bar.hidden { display: none; }
+
+/* Container simple */
+.container-simple {
+    max-width: 1360px;
+    margin: 24px auto;
+    padding: 0 24px;
+}
+
+/* Image preview */
+.image-preview {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.image-preview img {
+    width: 80px; height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* Product image */
+.product-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Favorite button on cards */
+.btn-fav-card {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    border-radius: 50%;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition);
+    z-index: 2;
+}
+
+.btn-fav-card:hover { transform: scale(1.12); }
+
+/* Payment */
+.payment-summary {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.payment-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+}
+
+.payment-row.total {
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    padding-top: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pay-method {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all var(--transition);
+}
+
+.pay-method:hover { border-color: var(--primary); background: white; }
+.pay-method input { cursor: pointer; }
+.pay-method input:checked + span { color: var(--primary); }
+
+/* Notifications */
+.notifs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notif-item {
+    display: flex;
+    gap: 14px;
+    padding: 18px;
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+}
+
+.notif-item:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+.notif-item.unread { border-left: 4px solid var(--primary); }
+
+.notif-icon {
+    width: 42px; height: 42px;
+    background: var(--primary-light);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.notif-content { flex: 1; }
+.notif-content strong { display: block; font-size: 14.5px; margin-bottom: 3px; color: var(--text); }
+.notif-content p { font-size: 13.5px; color: var(--text-2); margin-bottom: 4px; }
+.notif-content time { font-size: 12px; color: var(--text-3); }
+
+/* Verified badge */
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30,158,90,0.1);
+    color: var(--success);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+/* ============ MODE SOMBRE ============ */
+body.dark {
+    --primary: #1e7ec4;
+    --primary-2: #2b92d8;
+    --primary-light: #1a3a5c;
+    --bg: #0d1b2a;
+    --white: #16213e;
+    --text: #e8eef5;
+    --text-2: #a8b5c4;
+    --text-3: #6b7a8f;
+    --border: #1f2d44;
+    --border-2: #2d3d55;
+}
+
+body.dark .hero-pro { background: linear-gradient(180deg, #0d1b2a 0%, #0a1520 100%); }
+body.dark .navbar { background: rgba(13,27,42,0.92); }
+body.dark .feature,
+body.dark .step,
+body.dark .product-card,
+body.dark .sell-form-card,
+body.dark .my-listings-card,
+body.dark .conv-panel,
+body.dark .chat-panel,
+body.dark .account-card,
+body.dark .account-profile,
+body.dark .notif-item,
+body.dark .filters-panel,
+body.dark .auth-modal,
+body.dark .phone-screen { background: #16213e; }
+
+body.dark .chat-body { background: #0a1520; }
+body.dark .message.received { background: #1f2d44; color: var(--text); }
+
+body.dark .form-group input,
+body.dark .form-group select,
+body.dark .form-group textarea,
+body.dark .filter-block select,
+body.dark .filter-block input,
+body.dark .catalog-search,
+body.dark .catalog-sort,
+body.dark .chat-input-bar input {
+    background: #0d1b2a;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+body.dark .pay-method { background: #0d1b2a; }
+body.dark .payment-summary { background: #0d1b2a; }
+body.dark .btn-outline { background: transparent; color: var(--text); border-color: var(--border-2); }
+body.dark .btn-outline:hover { background: var(--primary-light); color: var(--primary); }
+body.dark .step-num { color: #1f2d44; }
+body.dark .product-visual { background: linear-gradient(135deg, #1f2d44 0%, #16213e 100%); }
+body.dark .hero-lead { color: var(--text-2); }
+body.dark .section-title { color: var(--text); }
+body.dark .info-row strong { color: var(--text); }
+body.dark .empty-catalog { background: #16213e; }
+body.dark .btn-fav-card { background: rgba(30,35,55,0.95); color: #e8eef5; }
+body.dark .profile-avatar { box-shadow: 0 10px 30px rgba(30,126,196,0.3); }
