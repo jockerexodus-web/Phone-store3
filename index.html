@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta name="description" content="Phone Store - Achetez et vendez des téléphones en ligne en toute sécurité. Créé par Waze Studio.">
+    <meta name="theme-color" content="#0a66c2">
+    <title>Phone Store — Acheter & Vendre des téléphones</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+</head>
+<body>
+
+    <!-- En-tête -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" aria-label="Phone Store accueil">
+                <span class="logo-icon">📱</span>
+                <span class="logo-text">Phone<strong>Store</strong></span>
+            </a>
+
+            <div class="search-bar" role="search">
+                <input type="search" id="searchInput" placeholder="Rechercher un téléphone..." aria-label="Rechercher" autocomplete="off" maxlength="80">
+                <button type="button" aria-label="Rechercher" onclick="PhoneStore.applyFilters()">🔍</button>
+            </div>
+
+            <nav class="nav-icons" aria-label="Navigation principale">
+                <button class="nav-btn" onclick="PhoneStore.scrollToListings()" title="Annonces">🏪</button>
+                <button class="nav-btn" onclick="PhoneStore.toggleFavoritesView()" title="Favoris">❤️</button>
+                <button class="btn-primary" onclick="PhoneStore.openModal()">+ Vendre</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Bandeau sécurité -->
+    <div class="security-banner">
+        🔒 Paiement sécurisé · Vérification des vendeurs · Protection acheteur
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3>Filtres</h3>
+
+            <div class="filter-group">
+                <label for="brandFilter">Marque</label>
+                <select id="brandFilter" onchange="PhoneStore.applyFilters()">
+                    <option value="">Toutes les marques</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Samsung">Samsung</option>
+                    <option value="Xiaomi">Xiaomi</option>
+                    <option value="Google">Google</option>
+                    <option value="OnePlus">OnePlus</option>
+                    <option value="Huawei">Huawei</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Prix (€)</label>
+                <div class="price-range">
+                    <input type="number" id="minPrice" placeholder="Min" min="0" max="10000" onchange="PhoneStore.applyFilters()" inputmode="numeric">
+                    <span>—</span>
+                    <input type="number" id="maxPrice" placeholder="Max" min="0" max="10000" onchange="PhoneStore.applyFilters()" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>État</label>
+                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Neuf" onchange="PhoneStore.applyFilters()"> Neuf</label>
+                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Comme neuf" onchange="PhoneStore.applyFilters()"> Comme neuf</label>
+                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Bon état" onchange="PhoneStore.applyFilters()"> Bon état</label>
+                <label class="checkbox-label"><input type="checkbox" class="conditionFilter" value="Correct" onchange="PhoneStore.applyFilters()"> Correct</label>
+            </div>
+
+            <button class="btn-secondary full-width" onclick="PhoneStore.resetFilters()">Réinitialiser</button>
+        </aside>
+
+        <!-- Annonces -->
+        <main class="main-content">
+            <div class="listings-header">
+                <h2 id="resultsCount">Annonces récentes</h2>
+                <select id="sortFilter" onchange="PhoneStore.applyFilters()" aria-label="Trier par">
+                    <option value="recent">Plus récentes</option>
+                    <option value="price-asc">Prix croissant</option>
+                    <option value="price-desc">Prix décroissant</option>
+                </select>
+            </div>
+
+            <div class="listings-grid" id="listingsGrid" role="list"></div>
+        </main>
+    </div>
+
+    <!-- Modal ajout annonce -->
+    <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+            <button class="modal-close" onclick="PhoneStore.closeModal()" aria-label="Fermer">&times;</button>
+            <h2 id="modalTitle">Vendre un téléphone</h2>
+
+            <form id="sellForm" onsubmit="PhoneStore.addListing(event)" novalidate>
+                <div class="form-group">
+                    <label for="title">Titre de l'annonce *</label>
+                    <input type="text" id="title" required maxlength="100" placeholder="Ex : iPhone 13 Pro 256Go" autocomplete="off">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="brand">Marque *</label>
+                        <select id="brand" required>
+                            <option value="">Choisir…</option>
+                            <option value="Apple">Apple</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Xiaomi">Xiaomi</option>
+                            <option value="Google">Google</option>
+                            <option value="OnePlus">OnePlus</option>
+                            <option value="Huawei">Huawei</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Prix (€) *</label>
+                        <input type="number" id="price" required min="0" max="10000" step="1" placeholder="450" inputmode="numeric">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="condition">État *</label>
+                        <select id="condition" required>
+                            <option value="Neuf">Neuf</option>
+                            <option value="Comme neuf">Comme neuf</option>
+                            <option value="Bon état">Bon état</option>
+                            <option value="Correct">Correct</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Localisation *</label>
+                        <input type="text" id="location" required maxlength="60" placeholder="Paris, 75001" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" maxlength="500" placeholder="Décrivez votre téléphone (état, accessoires, garantie…)"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="PhoneStore.closeModal()">Annuler</button>
+                    <button type="submit" class="btn-primary">Publier l'annonce</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+        <p>© 2025 <strong>Phone Store</strong> — Créé par <strong>Waze Studio</strong></p>
+        <p class="footer-sub">🔒 Site sécurisé · HTTPS · Protection des données</p>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
