@@ -1,7 +1,10 @@
 /* ============================================
    Phone Store — Logique applicative
-   Créé par Waze Studio — 2026
-   Sécurité : escapeHTML, sanitize, validation
+   Waze Studio — 2026/2027
+   - Inscription obligatoire pour utiliser le site
+   - Prix en FCFA
+   - Messagerie 100% réelle entre utilisateurs
+   - Zéro fausse annonce (catalogue vide par défaut)
    ============================================ */
 
 (function () {
@@ -15,25 +18,18 @@
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    function sanitize(str, maxLength = 200) {
+    function sanitize(str, max = 300) {
         if (typeof str !== 'string') return '';
-        return str.trim().replace(/\s+/g, ' ').slice(0, maxLength);
+        return str.trim().replace(/\s+/g, ' ').slice(0, max);
     }
 
-    function generateId(prefix = 'id') {
+    function uid(prefix = 'id') {
         return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     }
 
-    function formatPrice(n) {
-        return Number(n).toLocaleString('fr-FR') + ' €';
-    }
-
-    function timeAgo(date) {
-        const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-        if (diff < 60) return 'à l\'instant';
-        if (diff < 3600) return Math.floor(diff / 60) + ' min';
-        if (diff < 86400) return Math.floor(diff / 3600) + ' h';
-        return Math.floor(diff / 86400) + ' j';
+    function formatFCFA(n) {
+        const num = Number(n) || 0;
+        return num.toLocaleString('fr-FR').replace(/\u202f|\u00a0/g, ' ') + ' FCFA';
     }
 
     function nowTime() {
@@ -41,255 +37,398 @@
         return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
 
+    function timeAgo(ts) {
+        const diff = Math.floor((Date.now() - ts) / 1000);
+        if (diff < 60) return 'à l\'instant';
+        if (diff < 3600) return Math.floor(diff / 60) + ' min';
+        if (diff < 86400) return Math.floor(diff / 3600) + ' h';
+        if (diff < 604800) return Math.floor(diff / 86400) + ' j';
+        return new Date(ts).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+    }
+
+    function isValidEmail(e) {
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(e) && e.length <= 120;
+    }
+
+    function isValidPhone(p) {
+        return /^[+\d\s().-]{6,20}$/.test(p);
+    }
+
+    // ============ Stockage ============
+
+    const DB = {
+        users: 'ps_users_v1',
+        session: 'ps_session_v1',
+        products: 'ps_products_v1',
+        conversations: 'ps_conversations_v1'
+    };
+
+    function read(key, fallback) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return fallback;
+            const parsed = JSON.parse(raw);
+            return parsed ?? fallback;
+        } catch { return fallback; }
+    }
+
+    function write(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { console.warn(e); }
+    }
+
     // ============ État ============
 
     const state = {
+        user: null,           // utilisateur connecté
+        users: [],            // tous les utilisateurs
+        products: [],         // toutes les annonces (vides au départ)
+        conversations: [],    // toutes les conversations
+        activeConvId: null,
         currentView: 'accueil',
-        role: 'client',
-        products: [
-            { id: 'p1', title: 'iPhone 13 Pro 256Go', brand: 'Apple', price: 650, condition: 'Comme neuf', location: 'Paris, 75011', stock: 3, seller: 'Vous', description: 'Excellent état, boîte incluse.' },
-            { id: 'p2', title: 'Samsung Galaxy S22 Ultra', brand: 'Samsung', price: 480, condition: 'Bon état', location: 'Lyon, 69003', stock: 1, seller: 'Vous', description: 'Quelques micro-rayures.' },
-            { id: 'p3', title: 'Xiaomi Redmi Note 12', brand: 'Xiaomi', price: 150, condition: 'Neuf', location: 'Marseille, 13001', stock: 5, seller: 'Vous', description: 'Sous blister.' },
-            { id: 'p4', title: 'Google Pixel 7 Pro', brand: 'Google', price: 420, condition: 'Comme neuf', location: 'Toulouse, 31000', stock: 2, seller: 'Vous', description: 'Garantie constructeur.' },
-            { id: 'p5', title: 'OnePlus 11 5G 256Go', brand: 'OnePlus', price: 380, condition: 'Bon état', location: 'Bordeaux, 33000', stock: 1, seller: 'Vous', description: 'Chargeur rapide inclus.' },
-            { id: 'p6', title: 'iPhone 12 128Go — Bleu', brand: 'Apple', price: 350, condition: 'Bon état', location: 'Lille, 59000', stock: 4, seller: 'Vous', description: 'Batterie 89%.' },
-            { id: 'p7', title: 'Samsung Galaxy A54 5G', brand: 'Samsung', price: 220, condition: 'Comme neuf', location: 'Nantes, 44000', stock: 2, seller: 'Vous', description: 'Sous garantie 2026.' },
-            { id: 'p8', title: 'Huawei P60 Pro 256Go', brand: 'Huawei', price: 400, condition: 'Comme neuf', location: 'Strasbourg, 67000', stock: 1, seller: 'Vous', description: 'Double SIM.' }
-        ],
-        orders: [
-            { id: 'CMD-1042', customer: 'Marc D.', product: 'iPhone 13 Pro 256Go', amount: 650, status: 'Livré' },
-            { id: 'CMD-1041', customer: 'Sarah L.', product: 'Samsung Galaxy S22 Ultra', amount: 480, status: 'En cours' },
-            { id: 'CMD-1040', customer: 'Karim B.', product: 'Xiaomi Redmi Note 12', amount: 150, status: 'Livré' },
-            { id: 'CMD-1039', customer: 'Emma R.', product: 'Google Pixel 7 Pro', amount: 420, status: 'Expédié' },
-            { id: 'CMD-1038', customer: 'Lucas P.', product: 'iPhone 12 128Go', amount: 350, status: 'En attente' }
-        ],
-        customers: [
-            { name: 'Marc D.', email: 'marc@exemple.fr', orders: 4, total: 2140, color: '#0a66c2' },
-            { name: 'Sarah L.', email: 'sarah@exemple.fr', orders: 2, total: 830, color: '#e41e3f' },
-            { name: 'Karim B.', email: 'karim@exemple.fr', orders: 6, total: 1890, color: '#31a24c' },
-            { name: 'Emma R.', email: 'emma@exemple.fr', orders: 1, total: 420, color: '#f7b928' },
-            { name: 'Lucas P.', email: 'lucas@exemple.fr', orders: 3, total: 1150, color: '#8854d0' }
-        ],
-        conversations: [
-            {
-                id: 'c1',
-                name: 'Alex M.',
-                avatar: 'A',
-                color: '#0a66c2',
-                online: true,
-                unread: 2,
-                messages: [
-                    { text: 'Bonjour, l\'iPhone 13 Pro est-il toujours disponible ?', sender: 'them', time: '10:24' },
-                    { text: 'Bonjour ! Oui, il est en stock.', sender: 'me', time: '10:26' },
-                    { text: 'Parfait. Vous acceptez les paiements en plusieurs fois ?', sender: 'them', time: '10:27' },
-                    { text: 'Oui, 3x sans frais.', sender: 'me', time: '10:28' },
-                    { text: 'Super, je le prends !', sender: 'them', time: '10:30' },
-                    { text: 'Je vous envoie le lien de paiement sécurisé.', sender: 'them', time: '10:31' }
-                ]
-            },
-            {
-                id: 'c2',
-                name: 'Sophie L.',
-                avatar: 'S',
-                color: '#e41e3f',
-                online: true,
-                unread: 0,
-                messages: [
-                    { text: 'Bonjour, quel est le dernier prix pour le Galaxy S22 ?', sender: 'them', time: 'Hier' },
-                    { text: 'Je peux vous le laisser à 460€.', sender: 'me', time: 'Hier' },
-                    { text: 'C\'est noté, merci !', sender: 'them', time: 'Hier' }
-                ]
-            },
-            {
-                id: 'c3',
-                name: 'Karim B.',
-                avatar: 'K',
-                color: '#31a24c',
-                online: false,
-                unread: 0,
-                messages: [
-                    { text: 'Livraison bien reçue, merci beaucoup !', sender: 'them', time: 'Lun.' },
-                    { text: 'Avec plaisir, bonne journée !', sender: 'me', time: 'Lun.' }
-                ]
-            },
-            {
-                id: 'c4',
-                name: 'Emma R.',
-                avatar: 'E',
-                color: '#f7b928',
-                online: false,
-                unread: 1,
-                messages: [
-                    { text: 'Bonsoir, le Pixel 7 Pro est-il débloqué tout opérateur ?', sender: 'them', time: '20:15' }
-                ]
-            },
-            {
-                id: 'c5',
-                name: 'Lucas P.',
-                avatar: 'L',
-                color: '#8854d0',
-                online: true,
-                unread: 0,
-                messages: [
-                    { text: 'Super vendeur, je recommande !', sender: 'them', time: 'Dim.' }
-                ]
-            }
-        ],
-        activeConversation: null,
+        pendingAction: null,  // action à exécuter après connexion
         filters: { search: '', brand: '', minPrice: null, maxPrice: null, conditions: [], sort: 'recent' }
     };
 
-    // ============ Navigation entre vues ============
+    // ============ Persistance ============
 
-    function switchView(view) {
-        if (!['accueil', 'clients', 'vendeurs', 'messages'].includes(view)) return;
+    function loadAll() {
+        state.users = read(DB.users, []);
+        state.products = read(DB.products, []);
+        state.conversations = read(DB.conversations, []);
+        state.user = read(DB.session, null);
 
-        state.currentView = view;
-
-        // Masquer toutes les vues
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-
-        // Afficher la vue demandée
-        const target = document.getElementById('view-' + view);
-        if (target) target.classList.add('active');
-
-        // Mettre à jour les liens
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.toggle('active', link.dataset.view === view);
-        });
-
-        // Fermer menu mobile
-        document.querySelector('.nav-menu').classList.remove('active');
-        document.getElementById('userMenu').classList.remove('active');
-
-        // Scroll en haut
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Actions selon la vue
-        if (view === 'vendeurs') {
-            renderDashboard();
-        } else if (view === 'messages') {
-            renderConversations();
-        } else if (view === 'clients') {
-            renderListings();
+        // Vérifier que la session correspond à un utilisateur réel
+        if (state.user) {
+            const exists = state.users.find(u => u.id === state.user.id);
+            if (!exists) {
+                state.user = null;
+                write(DB.session, null);
+            }
         }
+    }
+
+    function saveUsers() { write(DB.users, state.users); }
+    function saveProducts() { write(DB.products, state.products); }
+    function saveConversations() { write(DB.conversations, state.conversations); }
+    function saveSession() { write(DB.session, state.user); }
+
+    // ============ Auth ============
+
+    let authTab = 'login';
+
+    function openAuth(tab) {
+        authTab = tab || 'login';
+        switchAuthTab(authTab);
+        document.getElementById('authOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAuth() {
+        document.getElementById('authOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+        document.getElementById('loginForm').reset();
+        document.getElementById('registerForm').reset();
+    }
+
+    function switchAuthTab(tab) {
+        authTab = tab;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+        document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+
+        const name = sanitize(document.getElementById('regName').value, 80);
+        const email = sanitize(document.getElementById('regEmail').value, 120).toLowerCase();
+        const phone = sanitize(document.getElementById('regPhone').value, 20);
+        const password = document.getElementById('regPassword').value;
+        const role = document.getElementById('regRole').value;
+        const terms = document.getElementById('regTerms').checked;
+
+        if (name.length < 2) return toast('Nom invalide', 'error');
+        if (!isValidEmail(email)) return toast('Email invalide', 'error');
+        if (!isValidPhone(phone)) return toast('Numéro de téléphone invalide', 'error');
+        if (password.length < 6) return toast('Mot de passe trop court (6 min.)', 'error');
+        if (!terms) return toast('Veuillez accepter les conditions', 'error');
+
+        if (state.users.find(u => u.email === email)) {
+            return toast('Cet email est déjà utilisé', 'error');
+        }
+
+        const user = {
+            id: uid('u'),
+            name,
+            email,
+            phone,
+            password, // ⚠️ démo — en prod : hash côté serveur
+            role,     // 'client' | 'vendeur' | 'both'
+            since: Date.now()
+        };
+
+        state.users.push(user);
+        saveUsers();
+
+        state.user = user;
+        saveSession();
+
+        closeAuth();
+        applyUserSession();
+        toast(`🎉 Bienvenue ${user.name.split(' ')[0]} !`, 'success');
+
+        // Exécuter l'action en attente
+        if (state.pendingAction) {
+            const act = state.pendingAction;
+            state.pendingAction = null;
+            setTimeout(() => act(), 200);
+        } else {
+            switchView('acheter');
+        }
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+
+        const email = sanitize(document.getElementById('loginEmail').value, 120).toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+
+        if (!isValidEmail(email)) return toast('Email invalide', 'error');
+        if (!password) return toast('Mot de passe requis', 'error');
+
+        const user = state.users.find(u => u.email === email && u.password === password);
+        if (!user) return toast('Email ou mot de passe incorrect', 'error');
+
+        state.user = user;
+        saveSession();
+
+        closeAuth();
+        applyUserSession();
+        toast(`👋 Bon retour ${user.name.split(' ')[0]} !`, 'success');
+
+        if (state.pendingAction) {
+            const act = state.pendingAction;
+            state.pendingAction = null;
+            setTimeout(() => act(), 200);
+        } else {
+            switchView('acheter');
+        }
+    }
+
+    function logout() {
+        state.user = null;
+        state.activeConvId = null;
+        saveSession();
+        applyUserSession();
+        closeUserMenu();
+        toast('Vous êtes déconnecté', 'info');
+        switchView('accueil');
+    }
+
+    function applyUserSession() {
+        const navAuth = document.querySelector('.nav-actions');
+        const navUser = document.getElementById('navUser');
+
+        if (state.user) {
+            navAuth.classList.add('hidden');
+            navUser.classList.remove('hidden');
+
+            const initial = state.user.name.charAt(0).toUpperCase();
+            document.getElementById('navUserAvatar').textContent = initial;
+            document.getElementById('navUserName').textContent = state.user.name.split(' ')[0];
+
+            const roleLabels = { client: 'Acheteur', vendeur: 'Vendeur', both: 'Acheteur & Vendeur' };
+            document.getElementById('navUserRole').textContent = roleLabels[state.user.role] || 'Utilisateur';
+
+            // Afficher/masquer les vues selon le rôle
+            const sellLink = document.querySelector('[data-view="vendre"]');
+            const buyLink = document.querySelector('[data-view="acheter"]');
+            if (sellLink) sellLink.style.display = (state.user.role === 'client') ? 'none' : '';
+            if (buyLink) buyLink.style.display = (state.user.role === 'vendeur') ? 'none' : '';
+        } else {
+            navAuth.classList.remove('hidden');
+            navUser.classList.add('hidden');
+            // Tous les liens visibles par défaut
+            document.querySelectorAll('.nav-link').forEach(l => l.style.display = '');
+        }
+
+        updateUnreadBadge();
+    }
+
+    function requireAuth(action) {
+        if (state.user) {
+            if (action === 'acheter') switchView('acheter');
+            else if (action === 'vendre') {
+                if (state.user.role === 'client') {
+                    toast('Créez un compte vendeur pour vendre', 'info');
+                    openAuth('register');
+                    return;
+                }
+                switchView('vendre');
+            }
+            return;
+        }
+
+        state.pendingAction = () => {
+            if (action === 'acheter') switchView('acheter');
+            else if (action === 'vendre') {
+                if (state.user.role === 'client') {
+                    toast('Votre compte est configuré comme acheteur', 'info');
+                } else {
+                    switchView('vendre');
+                }
+            }
+        };
+        toast('Connectez-vous pour continuer', 'info');
+        openAuth('register');
     }
 
     // ============ Menu utilisateur ============
 
     function toggleUserMenu() {
-        const menu = document.getElementById('userMenu');
-        menu.classList.toggle('active');
+        document.getElementById('userMenu').classList.toggle('active');
     }
 
-    function switchRole(role) {
-        state.role = role;
-        const nameEl = document.getElementById('userNameDisplay');
-        const roleEl = document.getElementById('userRoleDisplay');
-        const avatarLarge = document.getElementById('userAvatarLarge');
-        const avatarNav = document.querySelector('.user-avatar-nav');
-
-        if (role === 'vendeur') {
-            nameEl.textContent = 'Vendeur Pro';
-            roleEl.textContent = 'Boutique vérifiée';
-            avatarLarge.textContent = '🏪';
-            avatarNav.textContent = '🏪';
-            showToast('✅ Espace vendeur activé', 'success');
-            switchView('vendeurs');
-        } else {
-            nameEl.textContent = 'Client';
-            roleEl.textContent = 'Compte personnel';
-            avatarLarge.textContent = '👤';
-            avatarNav.textContent = '👤';
-            showToast('✅ Espace client activé', 'success');
-            switchView('clients');
-        }
+    function closeUserMenu() {
         document.getElementById('userMenu').classList.remove('active');
     }
 
-    function logout() {
-        state.role = 'client';
-        document.getElementById('userNameDisplay').textContent = 'Invité';
-        document.getElementById('userRoleDisplay').textContent = 'Non connecté';
-        document.getElementById('userAvatarLarge').textContent = '👤';
-        document.querySelector('.user-avatar-nav').textContent = '👤';
-        document.getElementById('userMenu').classList.remove('active');
-        showToast('👋 Déconnecté', 'success');
-        switchView('accueil');
+    function toggleMobileMenu() {
+        document.querySelector('.nav-menu').classList.toggle('active');
     }
 
-    // ============ Boutique clients ============
+    // ============ Navigation ============
 
-    function getFilteredProducts() {
-        let result = [...state.products];
+    function switchView(view) {
+        state.currentView = view;
 
-        if (state.filters.search) {
-            const q = state.filters.search.toLowerCase();
-            result = result.filter(p =>
-                p.title.toLowerCase().includes(q) ||
-                p.brand.toLowerCase().includes(q) ||
-                p.location.toLowerCase().includes(q)
-            );
-        }
-
-        if (state.filters.brand) result = result.filter(p => p.brand === state.filters.brand);
-        if (state.filters.minPrice !== null) result = result.filter(p => p.price >= state.filters.minPrice);
-        if (state.filters.maxPrice !== null) result = result.filter(p => p.price <= state.filters.maxPrice);
-
-        if (state.filters.conditions.length > 0) {
-            result = result.filter(p => state.filters.conditions.includes(p.condition));
-        }
-
-        switch (state.filters.sort) {
-            case 'price-asc': result.sort((a, b) => a.price - b.price); break;
-            case 'price-desc': result.sort((a, b) => b.price - a.price); break;
-            default: break;
-        }
-
-        return result;
-    }
-
-    function renderListings() {
-        const grid = document.getElementById('listingsGrid');
-        if (!grid) return;
-
-        const filtered = getFilteredProducts();
-
-        document.getElementById('resultsCount').textContent = 
-            `Boutique · ${filtered.length} produit${filtered.length > 1 ? 's' : ''}`;
-
-        if (filtered.length === 0) {
-            grid.innerHTML = `<div class="empty-message" style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#65676b;background:white;border-radius:16px;">😕 Aucun produit trouvé</div>`;
+        // Bloquer les vues sensibles sans connexion
+        if (!state.user && ['vendre', 'messages', 'compte'].includes(view)) {
+            toast('Connectez-vous pour accéder à cet espace', 'info');
+            openAuth('login');
             return;
         }
 
-        const emojis = { Apple: '🍎', Samsung: '📱', Xiaomi: '⚡', Google: '🔍', OnePlus: '1️⃣', Huawei: '🌸' };
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        const target = document.getElementById('view-' + view);
+        if (target) target.classList.add('active');
 
-        grid.innerHTML = filtered.map(p => `
-            <article class="card">
-                <div class="card-img">${emojis[p.brand] || '📱'}</div>
-                <div class="card-body">
-                    <div class="card-price">${formatPrice(p.price)}</div>
-                    <h3 class="card-title">${escapeHTML(p.title)}</h3>
-                    <div class="card-location">📍 ${escapeHTML(p.location)}</div>
-                    <div class="card-actions">
-                        <button class="btn-buy" onclick="PhoneStore.buyProduct('${escapeHTML(p.id)}')">Acheter</button>
-                        <button class="btn-contact" onclick="PhoneStore.contactSeller('${escapeHTML(p.id)}')">💬</button>
+        document.querySelectorAll('.nav-link').forEach(l =>
+            l.classList.toggle('active', l.dataset.view === view));
+
+        closeUserMenu();
+        document.querySelector('.nav-menu').classList.remove('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Rendus spécifiques
+        if (view === 'acheter') renderCatalog();
+        if (view === 'vendre') renderMyListings();
+        if (view === 'messages') renderConversations();
+        if (view === 'compte') renderAccount();
+    }
+
+    function navTo(e, view) {
+        if (e) e.preventDefault();
+        switchView(view);
+    }
+
+    function goHome(e) {
+        if (e) e.preventDefault();
+        switchView('accueil');
+    }
+
+    // ============ Catalogue (Acheter) ============
+
+    function getFilteredProducts() {
+        let list = [...state.products];
+
+        // Exclure les produits de l'utilisateur lui-même ? → Non, on les montre mais avec mention
+        if (state.filters.search) {
+            const q = state.filters.search.toLowerCase();
+            list = list.filter(p =>
+                (p.title || '').toLowerCase().includes(q) ||
+                (p.brand || '').toLowerCase().includes(q) ||
+                (p.location || '').toLowerCase().includes(q));
+        }
+
+        if (state.filters.brand) list = list.filter(p => p.brand === state.filters.brand);
+        if (state.filters.minPrice !== null) list = list.filter(p => p.price >= state.filters.minPrice);
+        if (state.filters.maxPrice !== null) list = list.filter(p => p.price <= state.filters.maxPrice);
+        if (state.filters.conditions.length) list = list.filter(p => state.filters.conditions.includes(p.condition));
+
+        switch (state.filters.sort) {
+            case 'price-asc': list.sort((a, b) => a.price - b.price); break;
+            case 'price-desc': list.sort((a, b) => b.price - a.price); break;
+            default: list.sort((a, b) => b.createdAt - a.createdAt);
+        }
+
+        return list;
+    }
+
+    function renderCatalog() {
+        const grid = document.getElementById('catalogGrid');
+        if (!grid) return;
+
+        const list = getFilteredProducts();
+
+        const countEl = document.getElementById('resultsCount');
+        countEl.textContent = `${list.length} téléphone${list.length > 1 ? 's' : ''} disponible${list.length > 1 ? 's' : ''}`;
+
+        if (list.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-catalog">
+                    <div class="empty-icon">📭</div>
+                    <h3>Aucun téléphone disponible</h3>
+                    <p>Aucune annonce n'est publiée pour le moment. Revenez plus tard ou publiez la vôtre.</p>
+                    ${state.user && state.user.role !== 'client'
+                        ? `<button class="btn-primary" onclick="PhoneStore.switchView('vendre')">Publier une annonce</button>`
+                        : `<button class="btn-primary" onclick="PhoneStore.openAuth('register')">Créer un compte</button>`}
+                </div>`;
+            return;
+        }
+
+        const brandEmojis = { Apple: '🍎', Samsung: '📱', Xiaomi: '⚡', Google: '🔍', OnePlus: '1️⃣', Huawei: '🌸', Oppo: '🟢', Autre: '📞' };
+
+        grid.innerHTML = list.map(p => {
+            const seller = state.users.find(u => u.id === p.sellerId);
+            const sellerName = seller ? seller.name : 'Utilisateur';
+            const initial = sellerName.charAt(0).toUpperCase();
+            const emoji = brandEmojis[p.brand] || '📱';
+            const isMine = state.user && p.sellerId === state.user.id;
+
+            return `
+                <div class="product-card">
+                    <div class="product-visual">
+                        <span class="product-condition-badge">${escapeHTML(p.condition)}</span>
+                        ${emoji}
                     </div>
-                </div>
-            </article>
-        `).join('');
+                    <div class="product-body">
+                        <div class="product-price">${formatFCFA(p.price)}</div>
+                        <h3 class="product-title">${escapeHTML(p.title)}</h3>
+                        <div class="product-loc">📍 ${escapeHTML(p.location)}</div>
+                        <div class="product-seller">
+                            <div class="product-seller-avatar">${escapeHTML(initial)}</div>
+                            <span>${escapeHTML(sellerName)}${isMine ? ' (vous)' : ''}</span>
+                        </div>
+                        <div class="product-actions">
+                            ${isMine
+                                ? `<button class="btn-buy" onclick="PhoneStore.deleteMyProduct('${p.id}')" style="background:#dc2626">Supprimer</button>`
+                                : `<button class="btn-buy" onclick="PhoneStore.contactSeller('${p.id}')">Contacter</button>`}
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
     }
 
     function applyFilters() {
         state.filters.brand = document.getElementById('brandFilter').value;
-        const min = document.getElementById('minPrice').value;
-        const max = document.getElementById('maxPrice').value;
-        state.filters.minPrice = min !== '' ? Math.max(0, Number(min)) : null;
-        state.filters.maxPrice = max !== '' ? Math.max(0, Number(max)) : null;
+        const minV = document.getElementById('minPrice').value;
+        const maxV = document.getElementById('maxPrice').value;
+        state.filters.minPrice = minV !== '' ? Math.max(0, Number(minV)) : null;
+        state.filters.maxPrice = maxV !== '' ? Math.max(0, Number(maxV)) : null;
         state.filters.sort = document.getElementById('sortFilter').value;
         state.filters.conditions = Array.from(document.querySelectorAll('.conditionFilter:checked')).map(c => c.value);
-        renderListings();
+        renderCatalog();
     }
 
     function resetFilters() {
@@ -300,453 +439,475 @@
         document.querySelectorAll('.conditionFilter').forEach(c => c.checked = false);
         document.getElementById('searchInput').value = '';
         state.filters = { search: '', brand: '', minPrice: null, maxPrice: null, conditions: [], sort: 'recent' };
-        renderListings();
-        showToast('Filtres réinitialisés', 'success');
+        renderCatalog();
+        toast('Filtres réinitialisés', 'info');
     }
 
-    function buyProduct(id) {
-        const product = state.products.find(p => p.id === id);
-        if (!product) return;
-        showToast(`✅ Commande passée : ${product.title}`, 'success');
+    // ============ Vendre ============
+
+    function publishProduct(e) {
+        e.preventDefault();
+
+        if (!state.user) {
+            toast('Connectez-vous pour publier', 'error');
+            openAuth('login');
+            return;
+        }
+
+        if (state.user.role === 'client') {
+            toast('Votre compte est configuré pour acheter uniquement', 'error');
+            return;
+        }
+
+        const title = sanitize(document.getElementById('pTitle').value, 100);
+        const brand = document.getElementById('pBrand').value;
+        const price = Number(document.getElementById('pPrice').value);
+        const condition = document.getElementById('pCondition').value;
+        const location = sanitize(document.getElementById('pLocation').value, 80);
+        const description = sanitize(document.getElementById('pDescription').value, 600);
+
+        if (title.length < 3) return toast('Titre trop court', 'error');
+        if (!brand) return toast('Marque requise', 'error');
+        if (!Number.isFinite(price) || price < 1000) return toast('Prix invalide (min. 1 000 FCFA)', 'error');
+        if (!location) return toast('Localisation requise', 'error');
+
+        const product = {
+            id: uid('p'),
+            title, brand, price, condition, location, description,
+            sellerId: state.user.id,
+            createdAt: Date.now()
+        };
+
+        state.products.unshift(product);
+        saveProducts();
+
+        document.getElementById('sellForm').reset();
+        renderMyListings();
+        toast('✅ Annonce publiée avec succès', 'success');
     }
 
-    function contactSeller(id) {
-        const product = state.products.find(p => p.id === id);
+    function renderMyListings() {
+        const container = document.getElementById('myListings');
+        if (!container) return;
+
+        if (!state.user) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><p>Connectez-vous pour gérer vos annonces.</p></div>`;
+            return;
+        }
+
+        const mine = state.products.filter(p => p.sellerId === state.user.id);
+
+        if (mine.length === 0) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>Vous n'avez publié aucune annonce.</p></div>`;
+            return;
+        }
+
+        const brandEmojis = { Apple: '🍎', Samsung: '📱', Xiaomi: '⚡', Google: '🔍', OnePlus: '1️⃣', Huawei: '🌸', Oppo: '🟢', Autre: '📞' };
+
+        container.innerHTML = mine.map(p => `
+            <div class="my-listing-item">
+                <div class="my-listing-thumb">${brandEmojis[p.brand] || '📱'}</div>
+                <div class="my-listing-info">
+                    <strong>${escapeHTML(p.title)}</strong>
+                    <span>${formatFCFA(p.price)} · ${escapeHTML(p.condition)}</span>
+                </div>
+                <div class="my-listing-actions">
+                    <button class="btn-mini danger" onclick="PhoneStore.deleteMyProduct('${p.id}')">Suppr.</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function deleteMyProduct(id) {
+        if (!state.user) return;
+        const product = state.products.find(p => p.id === id && p.sellerId === state.user.id);
+        if (!product) return;
+        if (!confirm('Supprimer cette annonce ?')) return;
+
+        state.products = state.products.filter(p => p.id !== id);
+        saveProducts();
+        renderMyListings();
+        renderCatalog();
+        toast('🗑️ Annonce supprimée', 'info');
+    }
+
+    // ============ Messagerie RÉELLE ============
+
+    function contactSeller(productId) {
+        if (!state.user) {
+            toast('Connectez-vous pour contacter le vendeur', 'info');
+            openAuth('login');
+            return;
+        }
+
+        const product = state.products.find(p => p.id === productId);
         if (!product) return;
 
-        // Créer ou ouvrir une conversation avec le vendeur
-        let conv = state.conversations.find(c => c.name === product.seller);
+        if (product.sellerId === state.user.id) {
+            toast('Vous ne pouvez pas vous contacter vous-même', 'info');
+            return;
+        }
+
+        // Chercher une conversation existante entre ces 2 utilisateurs
+        let conv = state.conversations.find(c =>
+            c.participants.length === 2 &&
+            c.participants.includes(state.user.id) &&
+            c.participants.includes(product.sellerId) &&
+            c.productId === productId
+        );
+
         if (!conv) {
             conv = {
-                id: generateId('c'),
-                name: product.seller,
-                avatar: product.seller.charAt(0),
-                color: '#0a66c2',
-                online: true,
-                unread: 0,
-                messages: [{ text: `Bonjour, je suis intéressé par "${product.title}".`, sender: 'me', time: nowTime() }]
+                id: uid('c'),
+                participants: [state.user.id, product.sellerId],
+                productId: product.id,
+                productTitle: product.title,
+                productPrice: product.price,
+                messages: [
+                    {
+                        id: uid('m'),
+                        senderId: state.user.id,
+                        text: `Bonjour, je suis intéressé(e) par "${product.title}" à ${formatFCFA(product.price)}.`,
+                        ts: Date.now(),
+                        readBy: [state.user.id]
+                    }
+                ],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
             };
             state.conversations.unshift(conv);
+            saveConversations();
         }
-        state.activeConversation = conv.id;
+
+        state.activeConvId = conv.id;
         switchView('messages');
         setTimeout(() => openConversation(conv.id), 100);
     }
 
-    // ============ Dashboard vendeur ============
-
-    function renderDashboard() {
-        // KPI
-        document.getElementById('kpiProducts').textContent = state.products.length;
-
-        const revenue = state.orders
-            .filter(o => o.status === 'Livré')
-            .reduce((sum, o) => sum + o.amount, 0);
-        document.getElementById('kpiRevenue').textContent = formatPrice(revenue);
-
-        document.getElementById('kpiOrders').textContent = state.orders.length;
-
-        // Table produits
-        const productsTable = document.getElementById('productsTable');
-        productsTable.innerHTML = state.products.map(p => `
-            <tr>
-                <td><strong>${escapeHTML(p.title)}</strong></td>
-                <td>${escapeHTML(p.brand)}</td>
-                <td><strong>${formatPrice(p.price)}</strong></td>
-                <td><span class="status-badge status-info">${escapeHTML(p.condition)}</span></td>
-                <td>${p.stock}</td>
-                <td>
-                    <button class="btn-table" onclick="PhoneStore.editProduct('${p.id}')">Modifier</button>
-                    <button class="btn-table danger" onclick="PhoneStore.deleteProduct('${p.id}')">Supprimer</button>
-                </td>
-            </tr>
-        `).join('');
-
-        // Table commandes
-        const ordersTable = document.getElementById('ordersTable');
-        const statusMap = {
-            'Livré': 'status-success',
-            'En cours': 'status-warning',
-            'Expédié': 'status-info',
-            'En attente': 'status-danger'
-        };
-        ordersTable.innerHTML = state.orders.map(o => `
-            <tr>
-                <td><strong>${escapeHTML(o.id)}</strong></td>
-                <td>${escapeHTML(o.customer)}</td>
-                <td>${escapeHTML(o.product)}</td>
-                <td><strong>${formatPrice(o.amount)}</strong></td>
-                <td><span class="status-badge ${statusMap[o.status] || 'status-info'}">${escapeHTML(o.status)}</span></td>
-            </tr>
-        `).join('');
-
-        // Table clients
-        const customersTable = document.getElementById('customersTable');
-        customersTable.innerHTML = state.customers.map(c => `
-            <tr>
-                <td>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:32px;height:32px;border-radius:50%;background:${c.color};color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">${escapeHTML(c.name.charAt(0))}</div>
-                        <strong>${escapeHTML(c.name)}</strong>
-                    </div>
-                </td>
-                <td>${escapeHTML(c.email)}</td>
-                <td>${c.orders}</td>
-                <td><strong>${formatPrice(c.total)}</strong></td>
-                <td><button class="btn-table" onclick="PhoneStore.contactSeller('${escapeHTML(c.name)}')">💬 Contacter</button></td>
-            </tr>
-        `).join('');
+    function getOtherParticipant(conv, meId) {
+        const otherId = conv.participants.find(p => p !== meId);
+        return state.users.find(u => u.id === otherId);
     }
 
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+    function getConversationsForUser() {
+        if (!state.user) return [];
+        return state.conversations
+            .filter(c => c.participants.includes(state.user.id))
+            .sort((a, b) => b.updatedAt - a.updatedAt);
     }
-
-    function deleteProduct(id) {
-        if (!confirm('Supprimer ce produit ?')) return;
-        state.products = state.products.filter(p => p.id !== id);
-        renderDashboard();
-        renderListings();
-        showToast('🗑️ Produit supprimé', 'success');
-    }
-
-    function editProduct(id) {
-        showToast('✏️ Modification bientôt disponible', 'success');
-    }
-
-    // ============ Modal produit ============
-
-    function openModal() {
-        document.getElementById('modalOverlay').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        setTimeout(() => document.getElementById('title').focus(), 100);
-    }
-
-    function closeModal() {
-        document.getElementById('modalOverlay').classList.remove('active');
-        document.body.style.overflow = '';
-        document.getElementById('productForm').reset();
-    }
-
-    function addProduct(event) {
-        event.preventDefault();
-
-        const title = sanitize(document.getElementById('title').value, 100);
-        const brand = document.getElementById('brand').value;
-        const price = Number(document.getElementById('price').value);
-        const condition = document.getElementById('condition').value;
-        const location = sanitize(document.getElementById('location').value, 60);
-        const stock = Math.min(999, Math.max(1, Number(document.getElementById('stock').value) || 1));
-        const description = sanitize(document.getElementById('description').value, 500);
-
-        if (title.length < 3) return showToast('Titre invalide', 'error');
-        if (!brand) return showToast('Marque requise', 'error');
-        if (!Number.isFinite(price) || price < 1) return showToast('Prix invalide', 'error');
-        if (!location) return showToast('Localisation requise', 'error');
-
-        const product = {
-            id: generateId('p'),
-            title, brand, price, condition, location, stock,
-            seller: 'Vous',
-            description
-        };
-
-        state.products.unshift(product);
-        closeModal();
-        renderDashboard();
-        renderListings();
-        showToast('✅ Produit publié !', 'success');
-    }
-
-    // ============ Messagerie ============
 
     function renderConversations() {
-        const list = document.getElementById('conversationsList');
+        const list = document.getElementById('convList');
         if (!list) return;
 
-        let convs = [...state.conversations];
+        if (!state.user) {
+            list.innerHTML = `<div class="empty-state" style="padding:40px 20px;"><div class="empty-icon">🔒</div><p>Connectez-vous pour voir vos messages.</p></div>`;
+            return;
+        }
 
-        const search = document.getElementById('convSearch').value.toLowerCase();
+        let convs = getConversationsForUser();
+
+        const search = (document.getElementById('convSearch').value || '').toLowerCase();
         if (search) {
-            convs = convs.filter(c => c.name.toLowerCase().includes(search));
+            convs = convs.filter(c => {
+                const other = getOtherParticipant(c, state.user.id);
+                return other && other.name.toLowerCase().includes(search);
+            });
+        }
+
+        if (convs.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state" style="padding:40px 20px;">
+                    <div class="empty-icon">💬</div>
+                    <p>Aucune conversation pour le moment.</p>
+                    <p style="font-size:12px;margin-top:6px;color:#8892a0;">Contactez un vendeur pour démarrer.</p>
+                </div>`;
+            return;
         }
 
         list.innerHTML = convs.map(c => {
-            const lastMsg = c.messages[c.messages.length - 1];
-            const preview = lastMsg ? lastMsg.text : 'Aucun message';
-            const time = lastMsg ? lastMsg.time : '';
+            const other = getOtherParticipant(c, state.user.id);
+            if (!other) return '';
+            const last = c.messages[c.messages.length - 1];
+            const unread = c.messages.filter(m => m.senderId !== state.user.id && !m.readBy.includes(state.user.id)).length;
 
             return `
-                <div class="conv-item ${state.activeConversation === c.id ? 'active' : ''}" onclick="PhoneStore.openConversation('${c.id}')">
-                    <div class="conv-avatar ${c.online ? 'online' : ''}" style="background:${c.color}">${escapeHTML(c.avatar)}</div>
-                    <div class="conv-info">
-                        <div class="conv-name">
-                            <span>${escapeHTML(c.name)}</span>
-                            <span class="conv-time">${escapeHTML(time)}</span>
+                <div class="conv-item ${state.activeConvId === c.id ? 'active' : ''}" onclick="PhoneStore.openConversation('${c.id}')">
+                    <div class="conv-avatar ${other.online ? 'online' : ''}">${escapeHTML(other.name.charAt(0).toUpperCase())}</div>
+                    <div class="conv-body">
+                        <div class="conv-top">
+                            <strong>${escapeHTML(other.name)}</strong>
+                            <span class="conv-time">${last ? timeAgo(last.ts) : ''}</span>
                         </div>
                         <div class="conv-preview">
-                            <span class="conv-preview-text">${escapeHTML(preview)}</span>
-                            ${c.unread > 0 ? `<span class="conv-unread">${c.unread}</span>` : ''}
+                            <span class="conv-preview-text">${last ? escapeHTML(last.text) : 'Aucun message'}</span>
+                            ${unread > 0 ? `<span class="conv-unread">${unread}</span>` : ''}
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
+    }
 
-        // Badge global
-        const totalUnread = state.conversations.reduce((sum, c) => sum + c.unread, 0);
+    function openConversation(convId) {
+        if (!state.user) return;
+        const conv = state.conversations.find(c => c.id === convId);
+        if (!conv || !conv.participants.includes(state.user.id)) return;
+
+        state.activeConvId = convId;
+
+        // Marquer les messages comme lus
+        let changed = false;
+        conv.messages.forEach(m => {
+            if (m.senderId !== state.user.id && !m.readBy.includes(state.user.id)) {
+                m.readBy.push(state.user.id);
+                changed = true;
+            }
+        });
+        if (changed) saveConversations();
+
+        const other = getOtherParticipant(conv, state.user.id);
+
+        // Header
+        document.getElementById('chatAvatar').textContent = other ? other.name.charAt(0).toUpperCase() : '?';
+        document.getElementById('chatAvatar').style.background = 'var(--grad-1)';
+        document.getElementById('chatAvatar').style.color = 'white';
+        document.getElementById('chatName').textContent = other ? other.name : 'Utilisateur';
+        document.getElementById('chatStatus').textContent = other && other.online ? '● En ligne' : '○ Hors ligne';
+
+        // Messages
+        renderChatMessages();
+
+        // Activer input
+        const input = document.getElementById('chatInput');
+        const btn = document.getElementById('sendBtn');
+        input.disabled = false;
+        btn.disabled = false;
+        setTimeout(() => input.focus(), 100);
+
+        // Re-render liste pour retirer badge non-lu
+        renderConversations();
+        updateUnreadBadge();
+    }
+
+    function renderChatMessages() {
+        const body = document.getElementById('chatBody');
+        const conv = state.conversations.find(c => c.id === state.activeConvId);
+
+        if (!conv) {
+            body.innerHTML = `
+                <div class="chat-empty">
+                    <div class="chat-empty-icon">💬</div>
+                    <p>Choisissez une conversation pour commencer</p>
+                </div>`;
+            return;
+        }
+
+        const html = [];
+
+        // Bandeau produit
+        if (conv.productTitle) {
+            html.push(`
+                <div class="msg-system">
+                    📱 ${escapeHTML(conv.productTitle)} · ${formatFCFA(conv.productPrice)}
+                </div>`);
+        }
+
+        conv.messages.forEach(m => {
+            const mine = m.senderId === state.user.id;
+            html.push(`
+                <div class="message ${mine ? 'sent' : 'received'}">
+                    ${escapeHTML(m.text)}
+                    <span class="msg-time">${new Date(m.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>`);
+        });
+
+        body.innerHTML = html.join('');
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function sendMessage(e) {
+        e.preventDefault();
+        if (!state.user) return;
+
+        const input = document.getElementById('chatInput');
+        const text = sanitize(input.value, 500);
+        if (!text) return;
+
+        const conv = state.conversations.find(c => c.id === state.activeConvId);
+        if (!conv) return;
+
+        conv.messages.push({
+            id: uid('m'),
+            senderId: state.user.id,
+            text,
+            ts: Date.now(),
+            readBy: [state.user.id]
+        });
+        conv.updatedAt = Date.now();
+
+        saveConversations();
+        input.value = '';
+        renderChatMessages();
+        renderConversations();
+    }
+
+    function updateUnreadBadge() {
+        if (!state.user) {
+            document.getElementById('unreadBadge').style.display = 'none';
+            return;
+        }
+        const total = state.conversations
+            .filter(c => c.participants.includes(state.user.id))
+            .reduce((sum, c) => sum + c.messages.filter(m =>
+                m.senderId !== state.user.id && !m.readBy.includes(state.user.id)).length, 0);
+
         const badge = document.getElementById('unreadBadge');
-        if (totalUnread > 0) {
-            badge.textContent = totalUnread;
+        if (total > 0) {
+            badge.textContent = total > 99 ? '99+' : total;
             badge.style.display = 'inline-block';
         } else {
             badge.style.display = 'none';
         }
     }
 
-    function openConversation(id) {
-        const conv = state.conversations.find(c => c.id === id);
-        if (!conv) return;
+    // ============ Compte ============
 
-        state.activeConversation = id;
-        conv.unread = 0;
+    function renderAccount() {
+        if (!state.user) return;
 
-        // Header
-        document.getElementById('chatAvatar').textContent = conv.avatar;
-        document.getElementById('chatAvatar').style.background = conv.color;
-        document.getElementById('chatAvatar').style.color = 'white';
-        document.getElementById('chatName').textContent = conv.name;
+        const initial = state.user.name.charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').textContent = initial;
+        document.getElementById('profileName').textContent = state.user.name;
+        document.getElementById('profileEmail').textContent = state.user.email;
 
-        const status = document.getElementById('chatStatus');
-        status.textContent = conv.online ? '● En ligne' : '○ Hors ligne';
-        status.className = 'chat-status' + (conv.online ? '' : ' offline');
+        const roleLabels = { client: 'Acheteur', vendeur: 'Vendeur', both: 'Acheteur & Vendeur' };
+        document.getElementById('profileRole').textContent = roleLabels[state.user.role] || 'Utilisateur';
 
-        // Messages
-        renderMessages();
+        document.getElementById('infoName').textContent = state.user.name;
+        document.getElementById('infoEmail').textContent = state.user.email;
+        document.getElementById('infoPhone').textContent = state.user.phone;
+        document.getElementById('infoSince').textContent = new Date(state.user.since).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
-        // Activer input
-        const input = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        input.disabled = false;
-        sendBtn.disabled = false;
-        setTimeout(() => input.focus(), 100);
+        // Statistiques
+        const myProducts = state.products.filter(p => p.sellerId === state.user.id);
+        const myMessages = state.conversations
+            .filter(c => c.participants.includes(state.user.id))
+            .reduce((sum, c) => sum + c.messages.filter(m => m.senderId === state.user.id).length, 0);
 
-        // Re-render liste
-        renderConversations();
+        document.getElementById('statListings').textContent = myProducts.length;
+        document.getElementById('statMessages').textContent = myMessages;
+        document.getElementById('statSales').textContent = '0'; // À brancher sur un vrai système de ventes
     }
 
-    function renderMessages() {
-        const container = document.getElementById('chatMessages');
-        const conv = state.conversations.find(c => c.id === state.activeConversation);
-
-        if (!conv) {
-            container.innerHTML = `
-                <div class="chat-empty">
-                    <div class="chat-empty-icon">💬</div>
-                    <p>Choisissez une conversation pour commencer</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = conv.messages.map(m => `
-            <div class="message ${m.sender === 'me' ? 'sent' : 'received'}">
-                ${escapeHTML(m.text)}
-                <span class="message-time">${escapeHTML(m.time)}</span>
-            </div>
-        `).join('');
-
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function sendMessage(event) {
-        event.preventDefault();
-
-        const input = document.getElementById('chatInput');
-        const text = sanitize(input.value, 500);
-        if (!text || !state.activeConversation) return;
-
-        const conv = state.conversations.find(c => c.id === state.activeConversation);
-        if (!conv) return;
-
-        conv.messages.push({
-            text,
-            sender: 'me',
-            time: nowTime()
-        });
-
-        input.value = '';
-        renderMessages();
-        renderConversations();
-
-        // Simulation réponse (typing + réponse auto)
-        setTimeout(() => {
-            const typing = document.createElement('div');
-            typing.className = 'typing-indicator';
-            typing.id = 'typingIndicator';
-            typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-            document.getElementById('chatMessages').appendChild(typing);
-            document.getElementById('chatMessages').scrollTop = 99999;
-
-            setTimeout(() => {
-                const el = document.getElementById('typingIndicator');
-                if (el) el.remove();
-
-                const replies = [
-                    'D\'accord, je regarde ça 👍',
-                    'Parfait, merci !',
-                    'Je vous confirme dans quelques minutes.',
-                    'Très bien, on fait comme ça.',
-                    'Vous pouvez passer commande en toute confiance.',
-                    'Super, bonne journée à vous !'
-                ];
-                const reply = replies[Math.floor(Math.random() * replies.length)];
-
-                conv.messages.push({
-                    text: reply,
-                    sender: 'them',
-                    time: nowTime()
-                });
-
-                if (state.activeConversation !== conv.id) {
-                    conv.unread = (conv.unread || 0) + 1;
-                }
-
-                renderMessages();
-                renderConversations();
-            }, 1200 + Math.random() * 800);
-        }, 400);
-    }
-
-    // ============ Compteurs animés ============
+    // ============ Compteurs hero ============
 
     function animateCounters() {
-        const counters = document.querySelectorAll('.stat-value');
-        const duration = 1800;
-
-        const observer = new IntersectionObserver((entries) => {
+        const counters = document.querySelectorAll('.stat-num');
+        const obs = new IntersectionObserver(entries => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const el = entry.target;
-                    const target = parseInt(el.dataset.target, 10);
-                    if (isNaN(target)) return;
-                    const start = performance.now();
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                const target = parseInt(el.dataset.target, 10);
+                if (isNaN(target)) return;
+                const start = performance.now();
+                const duration = 1600;
 
-                    function update(now) {
-                        const progress = Math.min((now - start) / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        el.textContent = Math.floor(target * eased).toLocaleString('fr-FR') + (progress === 1 && target >= 99 ? '+' : '');
-                        if (progress < 1) requestAnimationFrame(update);
-                    }
-                    requestAnimationFrame(update);
-                    observer.unobserve(el);
+                function tick(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.floor(target * eased).toLocaleString('fr-FR') + (p === 1 ? '+' : '');
+                    if (p < 1) requestAnimationFrame(tick);
                 }
+                requestAnimationFrame(tick);
+                obs.unobserve(el);
             });
         }, { threshold: 0.4 });
 
-        counters.forEach(c => observer.observe(c));
+        counters.forEach(c => obs.observe(c));
     }
 
     // ============ Toast ============
 
-    let toastTimer = null;
-    function showToast(message, type = '') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = 'toast show ' + type;
+    let toastTimer;
+    function toast(message, type = '') {
+        const el = document.getElementById('toast');
+        el.textContent = message;
+        el.className = 'toast show ' + type;
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
     }
 
-    // ============ Initialisation ============
+    // ============ Init ============
 
     function init() {
-        // Liens de navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const view = link.dataset.view;
-                if (view) switchView(view);
-            });
-        });
+        loadAll();
+        applyUserSession();
 
-        // Logo → accueil
-        document.querySelector('.logo').addEventListener('click', (e) => {
-            e.preventDefault();
-            switchView('accueil');
-        });
-
-        // Menu mobile
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.querySelector('.nav-menu').classList.toggle('active');
-        });
-
-        // Fermer menu utilisateur au clic extérieur
-        document.addEventListener('click', (e) => {
-            const userMenu = document.getElementById('userMenu');
-            const userBtn = document.getElementById('userBtn');
-            if (!userMenu.contains(e.target) && !userBtn.contains(e.target)) {
-                userMenu.classList.remove('active');
-            }
-        });
-
-        // Fermer modal via overlay
-        document.getElementById('modalOverlay').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeModal();
+        // Fermer auth via overlay
+        document.getElementById('authOverlay').addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeAuth();
         });
 
         // Échap
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeAuth();
+                closeUserMenu();
+            }
         });
 
-        // Recherche boutique (debounce)
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
+        // Fermer menu user si clic extérieur
+        document.addEventListener('click', e => {
+            const menu = document.getElementById('userMenu');
+            const btn = document.querySelector('#navUser .nav-btn');
+            if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+                closeUserMenu();
+            }
+        });
+
+        // Recherche catalogue (debounce)
+        const si = document.getElementById('searchInput');
+        if (si) {
             let t;
-            searchInput.addEventListener('input', (e) => {
+            si.addEventListener('input', e => {
                 clearTimeout(t);
                 t = setTimeout(() => {
                     state.filters.search = sanitize(e.target.value, 80).toLowerCase();
-                    renderListings();
-                }, 200);
+                    renderCatalog();
+                }, 180);
             });
         }
 
         // Recherche conversations
-        const convSearch = document.getElementById('convSearch');
-        if (convSearch) {
-            convSearch.addEventListener('input', renderConversations);
-        }
+        const cs = document.getElementById('convSearch');
+        if (cs) cs.addEventListener('input', renderConversations);
 
         // Compteurs
         animateCounters();
 
+        // Simulation "online" aléatoire (purement visuel)
+        state.users.forEach(u => u.online = Math.random() > 0.5);
+
         // Rendu initial
-        renderListings();
+        if (state.currentView === 'acheter') renderCatalog();
     }
 
     // ============ API publique ============
 
     window.PhoneStore = {
-        switchView,
-        toggleUserMenu,
-        switchRole,
-        logout,
-        applyFilters,
-        resetFilters,
-        buyProduct,
-        contactSeller,
-        openModal,
-        closeModal,
-        addProduct,
-        deleteProduct,
-        editProduct,
-        switchTab,
-        openConversation,
-        sendMessage,
-        showToast
+        // nav
+        switchView, navTo, goHome, toggleMobileMenu,
+        // auth
+        openAuth, closeAuth, switchAuthTab, handleLogin, handleRegister,
+        logout, toggleUserMenu, requireAuth,
+        // catalogue
+        applyFilters, resetFilters,
+        // vendeur
+        publishProduct, deleteMyProduct,
+        // messagerie
+        contactSeller, openConversation, sendMessage,
+        // ui
+        toast
     };
 
     if (document.readyState === 'loading') {
