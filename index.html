@@ -3,1039 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta name="description" content="Phone Store — La plateforme professionnelle de vente de téléphones. Achetez, vendez et échangez en toute sécurité.">
-    <meta name="theme-color" content="#0b1f3a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Phone Store">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230b1f3a'/><stop offset='1' stop-color='%231e7ec4'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>PS</text></svg>">
-    <title>Phone Store — La plateforme pro des téléphones | 2026/2027</title>
+    <title>TCHATCHIBARA-WEB School - Accueil</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-    <!-- ============ TOP BAR ============ -->
-    <div class="top-bar" id="topBar">
-        <div class="top-bar-inner">
-            <span class="top-bar-dot"></span>
-            <span id="topBarText">🔒 Plateforme sécurisée · Vérification d'identité obligatoire · Livraison dans toute l'Afrique de l'Ouest</span>
-            <button class="top-bar-close" onclick="PhoneStore.dismissTopBar()" aria-label="Fermer">×</button>
-        </div>
-    </div>
-
-    <!-- ============ NAVBAR ============ -->
-    <header class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo" onclick="PhoneStore.goHome(event)">
-                <span class="logo-mark">
-                    <span class="logo-mark-inner">PS</span>
-                </span>
-                <span class="logo-text">Phone<strong>Store</strong></span>
-            </a>
-
-            <nav class="nav-menu" aria-label="Menu principal">
-                <a href="#" class="nav-link active" data-view="accueil" onclick="PhoneStore.navTo(event,'accueil')">Accueil</a>
-                <a href="#" class="nav-link" data-view="acheter" onclick="PhoneStore.navTo(event,'acheter')">Acheter</a>
-                <a href="#" class="nav-link" data-view="vendre" onclick="PhoneStore.navTo(event,'vendre')">Vendre</a>
-                <a href="#" class="nav-link" data-view="favoris" onclick="PhoneStore.navTo(event,'favoris')">
-                    Favoris <span class="badge-count" id="favBadge" style="display:none">0</span>
-                </a>
-                <a href="#" class="nav-link" data-view="messages" onclick="PhoneStore.navTo(event,'messages')">
-                    Messages <span class="badge-count" id="unreadBadge" style="display:none">0</span>
-                </a>
-                <a href="#" class="nav-link" data-view="notifications" onclick="PhoneStore.navTo(event,'notifications')">
-                    <span class="nav-icon-bell">🔔</span>
-                    <span class="badge-count" id="notifBadge" style="display:none">0</span>
-                </a>
-            </nav>
-
-            <div class="nav-actions">
-                <button class="btn-icon-round" onclick="PhoneStore.toggleTheme()" title="Changer de thème" id="themeBtn">🌙</button>
-                <button class="btn-outline" onclick="PhoneStore.openAuth('login')">Connexion</button>
-                <button class="btn-primary" onclick="PhoneStore.openAuth('register')">S'inscrire</button>
-                <button class="menu-toggle" onclick="PhoneStore.toggleMobileMenu()" aria-label="Menu">☰</button>
+    <!-- HEADER -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                TCHATCHIBARA-WEB<span>School</span>
             </div>
-
-            <div class="nav-user hidden" id="navUser">
-                <div class="nav-user-avatar" id="navUserAvatar">?</div>
-                <div class="nav-user-info">
-                    <strong id="navUserName">—</strong>
-                    <span id="navUserRole">—</span>
-                </div>
-                <button class="nav-btn" onclick="PhoneStore.toggleUserMenu()">▾</button>
-                <div class="user-menu" id="userMenu">
-                    <div class="user-menu-head">
-                        <div class="user-menu-avatar" id="userMenuAvatar">?</div>
-                        <div>
-                            <strong id="userMenuName">—</strong>
-                            <span id="userMenuEmail">—</span>
-                        </div>
-                    </div>
-                    <hr>
-                    <button class="user-menu-item" onclick="PhoneStore.navTo(null,'compte')">
-                        <span class="um-icon">👤</span> Mon compte
-                    </button>
-                    <button class="user-menu-item" onclick="PhoneStore.navTo(null,'messages')">
-                        <span class="um-icon">💬</span> Messages
-                    </button>
-                    <button class="user-menu-item" onclick="PhoneStore.navTo(null,'favoris')">
-                        <span class="um-icon">❤️</span> Mes favoris
-                    </button>
-                    <button class="user-menu-item" onclick="PhoneStore.navTo(null,'vendre')">
-                        <span class="um-icon">💰</span> Vendre
-                    </button>
-                    <hr>
-                    <button class="user-menu-item danger" onclick="PhoneStore.logout()">
-                        <span class="um-icon">🚪</span> Déconnexion
-                    </button>
-                </div>
-            </div>
-        </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="#classes">Classes</a></li>
+                <li><a href="bac.html">Baccalauréat</a></li>
+                <li><a href="exercices.html">Exercices</a></li>
+                <li><a href="#" class="btn-connexion">Connexion</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <!-- ============ VUE ACCUEIL ============ -->
-    <main id="view-accueil" class="view active">
+    <!-- HERO -->
+    <section class="hero">
+        <h1>Bienvenue sur <span>TCHATCHIBARA-WEB School</span></h1>
+        <p>Plateforme éducative conforme au <strong>programme officiel du Gabon</strong>. Cours, exercices corrigés, devoirs du Baccalauréat et explications détaillées de la 6ème à la Terminale (séries A, B, C, D, A1, A2).</p>
+        <a href="#classes" class="cta">Explorer les classes <i class="fas fa-arrow-right"></i></a>
+    </section>
 
-        <!-- HERO -->
-        <section class="hero-pro">
-            <div class="hero-pattern"></div>
-            <div class="hero-blob hero-blob-1"></div>
-            <div class="hero-blob hero-blob-2"></div>
+    <!-- CLASSES -->
+    <section id="classes" class="classes-section">
+        <h2 class="section-title">Programme du Secondaire au Gabon</h2>
+        <p class="section-sub">Contenus conformes aux programmes du Ministère de l'Éducation Nationale du Gabon.</p>
 
-            <div class="hero-pro-inner">
-                <div class="hero-left">
-                    <div class="hero-eyebrow">
-                        <span class="dot-live"></span>
-                        Édition 2026 / 2027 · Nouvelle génération
-                    </div>
-
-                    <h1 class="hero-h1">
-                        Achetez et vendez<br>
-                        vos téléphones en <span class="accent-gradient">toute confiance</span>
-                    </h1>
-
-                    <p class="hero-lead">
-                        La première plateforme professionnelle d'Afrique de l'Ouest dédiée
-                        au commerce de téléphones. Vendeurs vérifiés, paiements sécurisés,
-                        transactions protégées.
-                    </p>
-
-                    <div class="hero-cta">
-                        <button class="btn-lg-primary" onclick="PhoneStore.requireAuth('acheter')">
-                            <span>Découvrir les téléphones</span>
-                            <span class="btn-arrow">→</span>
-                        </button>
-                        <button class="btn-lg-outline" onclick="PhoneStore.requireAuth('vendre')">
-                            Vendre mon téléphone
-                        </button>
-                    </div>
-
-                    <div class="hero-trust">
-                        <div class="trust-pill"><span class="tp-icon">🔒</span> Paiement sécurisé</div>
-                        <div class="trust-pill"><span class="tp-icon">✅</span> Vendeurs vérifiés</div>
-                        <div class="trust-pill"><span class="tp-icon">🛡️</span> Transaction protégée</div>
-                    </div>
-
-                    <div class="hero-brands">
-                        <span class="hero-brands-label">Marques disponibles :</span>
-                        <div class="hero-brands-list">
-                            <span class="hero-brand-chip"> Apple</span>
-                            <span class="hero-brand-chip">Samsung</span>
-                            <span class="hero-brand-chip">Xiaomi</span>
-                            <span class="hero-brand-chip">Google</span>
-                            <span class="hero-brand-chip">OnePlus</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hero-right">
-                    <div class="hero-visual">
-                        <div class="hero-glow"></div>
-
-                        <div class="phone-mockup">
-                            <div class="phone-notch"></div>
-                            <div class="phone-screen">
-                                <div class="ps-status-bar">
-                                    <span>9:41</span>
-                                    <span class="ps-status-icons">📶 🔋</span>
-                                </div>
-                                <div class="ps-header">
-                                    <span class="ps-header-greeting">Bonjour 👋</span>
-                                    <span class="ps-header-sub">Que cherchez-vous ?</span>
-                                </div>
-                                <div class="ps-search">
-                                    <span class="ps-search-icon">🔍</span>
-                                    <span class="ps-search-text">Rechercher un téléphone...</span>
-                                </div>
-                                <div class="ps-balance">
-                                    <span class="ps-label">Solde disponible</span>
-                                    <span class="ps-amount">1 250 000 <span class="ps-currency">FCFA</span></span>
-                                    <div class="ps-balance-trend">+12,4% ce mois</div>
-                                </div>
-                                <div class="ps-actions">
-                                    <div class="ps-action">
-                                        <div class="ps-action-icon">🛒</div>
-                                        <span>Acheter</span>
-                                    </div>
-                                    <div class="ps-action">
-                                        <div class="ps-action-icon">💰</div>
-                                        <span>Vendre</span>
-                                    </div>
-                                    <div class="ps-action">
-                                        <div class="ps-action-icon">💬</div>
-                                        <span>Chat</span>
-                                    </div>
-                                </div>
-                                <div class="ps-cards">
-                                    <div class="ps-mini-card">
-                                        <div class="ps-mini-icon">📱</div>
-                                        <div class="ps-mini-info">
-                                            <strong>iPhone 14 Pro</strong>
-                                            <span>450 000 FCFA</span>
-                                        </div>
-                                    </div>
-                                    <div class="ps-mini-card">
-                                        <div class="ps-mini-icon">📱</div>
-                                        <div class="ps-mini-info">
-                                            <strong>Galaxy S23</strong>
-                                            <span>380 000 FCFA</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="float-card float-1">
-                            <div class="float-icon float-icon-success">✅</div>
-                            <div class="float-content">
-                                <strong>Vendeur vérifié</strong>
-                                <span>Identité confirmée</span>
-                            </div>
-                        </div>
-
-                        <div class="float-card float-2">
-                            <div class="float-icon float-icon-primary">💬</div>
-                            <div class="float-content">
-                                <strong>Nouveau message</strong>
-                                <span>Alex M. · à l'instant</span>
-                            </div>
-                        </div>
-
-                        <div class="float-card float-3">
-                            <div class="float-icon float-icon-warning">⚡</div>
-                            <div class="float-content">
-                                <strong>Vente réussie</strong>
-                                <span>+450 000 FCFA</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="classes-grid">
+            <div class="class-card">
+                <i class="fas fa-book-open"></i>
+                <h3>6ème & 5ème</h3>
+                <p><strong>Matières :</strong> Français, Mathématiques, Anglais, SVT, Physique-Chimie, Histoire-Géo, ECM, EPS.</p>
+                <p><strong>Objectif :</strong> Consolidation des bases du primaire et préparation au cycle moyen.</p>
+                <a href="#" class="btn-small">Voir les cours</a>
             </div>
 
-            <div class="hero-scroll">
-                <span>Explorer</span>
-                <div class="scroll-line"></div>
+            <div class="class-card">
+                <i class="fas fa-flask"></i>
+                <h3>4ème & 3ème (BEPC)</h3>
+                <p><strong>Matières :</strong> Maths, PC, SVT, Français, Anglais, Histoire-Géo, ECM, Espagnol/Allemand.</p>
+                <p><strong>Objectif :</strong> Préparation intensive au <strong>BEPC gabonais</strong>.</p>
+                <a href="#" class="btn-small">Voir les cours</a>
             </div>
-        </section>
 
-        <!-- STATS -->
-        <section class="stats-strip">
-            <div class="stats-inner">
-                <div class="stat-item">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-num" data-target="18500">0</div>
-                    <div class="stat-lbl">Transactions réussies</div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-num" data-target="4200">0</div>
-                    <div class="stat-lbl">Utilisateurs actifs</div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-num" data-target="98">0</div>
-                    <div class="stat-lbl">% Satisfaction</div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-icon">⏱️</div>
-                    <div class="stat-num" data-target="24">0</div>
-                    <div class="stat-lbl">h Support moyen</div>
-                </div>
+            <div class="class-card">
+                <i class="fas fa-calculator"></i>
+                <h3>2nde (A, B, C, D, E)</h3>
+                <p><strong>Séries :</strong> A (Littéraire), B (Économique), C (Maths-Sciences), D (Sciences), E (Technique).</p>
+                <p><strong>Objectif :</strong> Orientation et consolidation des acquis du collège.</p>
+                <a href="#" class="btn-small">Voir les cours</a>
             </div>
-        </section>
 
-        <!-- COMMENT ÇA MARCHE -->
-        <section class="section how-section">
-            <div class="section-inner">
-                <div class="section-head">
-                    <div class="section-eyebrow">
-                        <span class="se-dot"></span> Comment ça marche
-                    </div>
-                    <h2 class="section-title">Simple, rapide, sécurisé</h2>
-                    <p class="section-sub">Trois étapes suffisent pour acheter ou vendre votre téléphone en toute confiance.</p>
-                </div>
-
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-badge">01</div>
-                        <div class="step-icon-wrap">
-                            <div class="step-icon">📝</div>
-                        </div>
-                        <h3>Créez votre compte</h3>
-                        <p>Inscription gratuite et rapide en moins de 60 secondes. Vérification d'email sécurisée.</p>
-                        <div class="step-line"></div>
-                    </div>
-                    <div class="step">
-                        <div class="step-badge">02</div>
-                        <div class="step-icon-wrap">
-                            <div class="step-icon">🔍</div>
-                        </div>
-                        <h3>Achetez ou vendez</h3>
-                        <p>Parcourez les annonces ou publiez la vôtre en quelques clics. Photos incluses.</p>
-                        <div class="step-line"></div>
-                    </div>
-                    <div class="step">
-                        <div class="step-badge">03</div>
-                        <div class="step-icon-wrap">
-                            <div class="step-icon">🤝</div>
-                        </div>
-                        <h3>Concluez en sécurité</h3>
-                        <p>Discutez via notre messagerie temps réel et payez via Mobile Money en toute confiance.</p>
-                    </div>
-                </div>
+            <div class="class-card">
+                <i class="fas fa-atom"></i>
+                <h3>1ère (A1, A2, B, C, D, E)</h3>
+                <p><strong>Séries :</strong> A1 (Lettres), A2 (Langues), B (Éco), C (Maths), D (Sciences), E (Technique).</p>
+                <p><strong>Objectif :</strong> Approfondissement et préparation aux épreuves de Terminale.</p>
+                <a href="#" class="btn-small">Voir les cours</a>
             </div>
-        </section>
 
-        <!-- AVANTAGES -->
-        <section class="section features-section">
-            <div class="section-inner">
-                <div class="section-head">
-                    <div class="section-eyebrow">
-                        <span class="se-dot"></span> Pourquoi Phone Store
-                    </div>
-                    <h2 class="section-title">Une plateforme pensée pour vous</h2>
-                    <p class="section-sub">Tout ce dont vous avez besoin pour vendre et acheter en toute sérénité.</p>
-                </div>
-
-                <div class="features-grid">
-                    <div class="feature">
-                        <div class="feature-icon-wrap">
-                            <div class="feature-icon">🔐</div>
-                        </div>
-                        <h3>Sécurité maximale</h3>
-                        <p>Vérification d'identité, chiffrement des échanges et protection à chaque transaction.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon-wrap">
-                            <div class="feature-icon">💬</div>
-                        </div>
-                        <h3>Messagerie temps réel</h3>
-                        <p>Discutez instantanément avec les autres utilisateurs grâce à notre technologie Realtime.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon-wrap">
-                            <div class="feature-icon">💵</div>
-                        </div>
-                        <h3>Prix en FCFA</h3>
-                        <p>Tous les tarifs sont affichés en Franc CFA, pour une transparence totale.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon-wrap">
-                            <div class="feature-icon">🏆</div>
-                        </div>
-                        <h3>Vendeurs certifiés</h3>
-                        <p>Chaque vendeur est vérifié par notre équipe avant publication d'annonces.</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon-wrap">
-                            <div class="feature-icon">📱</div>
-                        </div>
-                        <h3>Application installable</h3>
-                        <p>Installez Phone Store sur votre téléphone comme une application native (PWA).</p>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon-wrap">
-                            <div class="feature-icon">📞</div>
-                        </div>
-                        <h3>Support 24/7</h3>
-                        <p>Notre équipe est disponible à tout moment pour vous accompagner dans vos démarches.</p>
-                    </div>
-                </div>
+            <div class="class-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Terminale (A1, A2, B, C, D)</h3>
+                <p><strong>Séries :</strong> A1, A2, B, C, D avec préparation au <strong>Baccalauréat gabonais</strong>.</p>
+                <p><strong>Objectif :</strong> Réussite au Bac et orientation universitaire.</p>
+                <a href="#" class="btn-small">Voir les cours</a>
             </div>
-        </section>
 
-        <!-- MARQUES PARTENAIRES -->
-        <section class="section brands-section">
-            <div class="section-inner">
-                <div class="section-head">
-                    <div class="section-eyebrow">
-                        <span class="se-dot"></span> Marques disponibles
-                    </div>
-                    <h2 class="section-title">Les plus grandes marques</h2>
-                    <p class="section-sub">Retrouvez tous vos modèles préférés sur notre plateforme.</p>
-                </div>
-
-                <div class="brands-grid">
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">🍎</div>
-                        <div class="brand-name">Apple</div>
-                        <div class="brand-count">iPhone · iPad · Watch</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">📱</div>
-                        <div class="brand-name">Samsung</div>
-                        <div class="brand-count">Galaxy S · A · Z</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">⚡</div>
-                        <div class="brand-name">Xiaomi</div>
-                        <div class="brand-count">Redmi · Mi · POCO</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">🔍</div>
-                        <div class="brand-name">Google</div>
-                        <div class="brand-count">Pixel · Nest</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">1️⃣</div>
-                        <div class="brand-name">OnePlus</div>
-                        <div class="brand-count">Nord · Flagship</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">🌸</div>
-                        <div class="brand-name">Huawei</div>
-                        <div class="brand-count">P · Mate · Nova</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">🟢</div>
-                        <div class="brand-name">Oppo</div>
-                        <div class="brand-count">Find · Reno · A</div>
-                    </div>
-                    <div class="brand-card" onclick="PhoneStore.requireAuth('acheter')">
-                        <div class="brand-logo-wrap">📞</div>
-                        <div class="brand-name">Autres</div>
-                        <div class="brand-count">Toutes marques</div>
-                    </div>
-                </div>
+            <div class="class-card">
+                <i class="fas fa-laptop-code"></i>
+                <h3>Ressources Complémentaires</h3>
+                <p>Annales du Bac, devoirs surveillés, concours blancs, méthodologie et orientation.</p>
+                <a href="bac.html" class="btn-small">Voir les devoirs</a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- TÉMOIGNAGES -->
-        <section class="section testimonials-section">
-            <div class="section-inner">
-                <div class="section-head">
-                    <div class="section-eyebrow">
-                        <span class="se-dot"></span> Témoignages
-                    </div>
-                    <h2 class="section-title">Ils nous font confiance</h2>
-                    <p class="section-sub">Découvrez les retours de nos utilisateurs.</p>
-                </div>
-
-                <div class="testimonials-grid">
-                    <div class="testimonial">
-                        <div class="testimonial-stars">★★★★★</div>
-                        <p class="testimonial-text">"Une plateforme sérieuse et professionnelle. J'ai vendu mon iPhone en moins de 48h à un excellent prix."</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar" style="background: linear-gradient(135deg, #0b1f3a, #1e7ec4);">A</div>
-                            <div>
-                                <strong>Alexandra M.</strong>
-                                <span>Vendeuse · Abidjan</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial">
-                        <div class="testimonial-stars">★★★★★</div>
-                        <p class="testimonial-text">"La messagerie temps réel est incroyable, on discute directement avec le vendeur. Paiement Wave en 2 clics."</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">K</div>
-                            <div>
-                                <strong>Karim B.</strong>
-                                <span>Acheteur · Dakar</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial">
-                        <div class="testimonial-stars">★★★★★</div>
-                        <p class="testimonial-text">"Interface magnifique, très rapide et sécurisée. Je recommande vivement Phone Store à tous !"</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">S</div>
-                            <div>
-                                <strong>Sophie L.</strong>
-                                <span>Vendeuse Pro · Lomé</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- POINTS FORTS -->
+    <section class="exam-section">
+        <h2 class="section-title">Pourquoi choisir TCHATCHIBARA-WEB School ?</h2>
+        <p class="section-sub">Une plateforme 100% gabonaise, adaptée à nos réalités éducatives.</p>
+        <div class="exam-grid">
+            <div class="exam-card">
+                <h3><i class="fas fa-check-circle"></i> Programme officiel</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Contenus conformes au MEN Gabon</li>
+                    <li><i class="fas fa-check"></i> Progression annuelle respectée</li>
+                    <li><i class="fas fa-check"></i> Sujets types BEPC & Bac</li>
+                </ul>
             </div>
-        </section>
-
-        <!-- CTA FINAL -->
-        <section class="cta-pro">
-            <div class="cta-pro-inner">
-                <div class="cta-badge">🎉 Inscription gratuite</div>
-                <h2>Rejoignez Phone Store aujourd'hui</h2>
-                <p>Créez votre compte gratuit et commencez à acheter ou vendre en toute sécurité dès maintenant.</p>
-                <div class="cta-buttons">
-                    <button class="btn-cta-white" onclick="PhoneStore.openAuth('register')">
-                        Créer mon compte gratuit
-                    </button>
-                    <button class="btn-cta-ghost" onclick="PhoneStore.openAuth('login')">
-                        J'ai déjà un compte
-                    </button>
-                </div>
-                <div class="cta-features">
-                    <span>✅ Aucune carte requise</span>
-                    <span>✅ 100% sécurisé</span>
-                    <span>✅ Support 24/7</span>
-                </div>
+            <div class="exam-card">
+                <h3><i class="fas fa-check-circle"></i> Exercices corrigés</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Explications pas à pas</li>
+                    <li><i class="fas fa-check"></i> Méthodologie détaillée</li>
+                    <li><i class="fas fa-check"></i> Corrigés téléchargeables</li>
+                </ul>
             </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <div class="footer-inner">
-                <div class="footer-brand">
-                    <div class="footer-logo">
-                        <span class="logo-mark"><span class="logo-mark-inner">PS</span></span>
-                        <span class="logo-text">Phone<strong>Store</strong></span>
-                    </div>
-                    <p>La plateforme professionnelle de vente de téléphones en Afrique de l'Ouest.</p>
-                    <div class="footer-social">
-                        <a href="#" aria-label="Facebook">📘</a>
-                        <a href="#" aria-label="Instagram">📷</a>
-                        <a href="#" aria-label="Twitter">🐦</a>
-                        <a href="#" aria-label="LinkedIn">💼</a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <div class="footer-col">
-                        <h4>Plateforme</h4>
-                        <a href="#" onclick="PhoneStore.navTo(event,'acheter')">Acheter</a>
-                        <a href="#" onclick="PhoneStore.navTo(event,'vendre')">Vendre</a>
-                        <a href="#" onclick="PhoneStore.navTo(event,'favoris')">Favoris</a>
-                    </div>
-                    <div class="footer-col">
-                        <h4>Support</h4>
-                        <a href="#" onclick="event.preventDefault()">Centre d'aide</a>
-                        <a href="#" onclick="event.preventDefault()">Contact</a>
-                        <a href="#" onclick="event.preventDefault()">Signaler un problème</a>
-                    </div>
-                    <div class="footer-col">
-                        <h4>Légal</h4>
-                        <a href="#" onclick="event.preventDefault()">CGV</a>
-                        <a href="#" onclick="event.preventDefault()">Confidentialité</a>
-                        <a href="#" onclick="event.preventDefault()">Mentions légales</a>
-                    </div>
-                </div>
+            <div class="exam-card">
+                <h3><i class="fas fa-check-circle"></i> Accessible partout</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Mobile, tablette, ordinateur</li>
+                    <li><i class="fas fa-check"></i> 100% gratuit</li>
+                    <li><i class="fas fa-check"></i> Disponible 24h/24</li>
+                </ul>
             </div>
-            <div class="footer-bottom">
-                <p>© 2026 <strong>Phone Store</strong> — Tous droits réservés</p>
-                <p>Créé avec ❤️ par <strong>Waze Studio</strong> · Fait en Afrique de l'Ouest 🌍</p>
-            </div>
-        </footer>
-    </main>
+        </div>
+    </section>
 
-    <!-- ============ VUE ACHETER ============ -->
-    <main id="view-acheter" class="view">
-        <div class="page-header">
-            <div class="page-header-inner">
-                <div class="page-header-left">
-                    <div class="page-header-eyebrow">🛒 Catalogue</div>
-                    <h1>Acheter un téléphone</h1>
-                    <p>Découvrez les téléphones disponibles publiés par nos utilisateurs vérifiés.</p>
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>TCHATCHIBARA-WEB School</h4>
+                <p>Plateforme éducative gabonaise dédiée aux élèves du secondaire. Cours, exercices et annales du Bac conformes au programme national.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="#classes">Classes</a></li>
+                    <li><a href="bac.html">Baccalauréat</a></li>
+                    <li><a href="exercices.html">Exercices</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> contact@tchatchibara-web.ga</li>
+                    <li><i class="fas fa-phone"></i> +241 01 23 45 67</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Libreville, Gabon</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Suivez-nous</h4>
+                <div class="social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
-
-        <div class="catalog-layout">
-            <aside class="filters-panel">
-                <div class="filters-head">
-                    <h3>🔎 Filtres</h3>
-                    <button class="link-btn" onclick="PhoneStore.resetFilters()">Effacer</button>
-                </div>
-
-                <div class="filter-block">
-                    <label for="brandFilter">Marque</label>
-                    <select id="brandFilter" onchange="PhoneStore.applyFilters()">
-                        <option value="">Toutes les marques</option>
-                        <option value="Apple"> Apple</option>
-                        <option value="Samsung">Samsung</option>
-                        <option value="Xiaomi">Xiaomi</option>
-                        <option value="Google">Google</option>
-                        <option value="OnePlus">OnePlus</option>
-                        <option value="Huawei">Huawei</option>
-                        <option value="Oppo">Oppo</option>
-                        <option value="Autre">Autre</option>
-                    </select>
-                </div>
-
-                <div class="filter-block">
-                    <label>Prix (FCFA)</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minPrice" placeholder="Min" min="0" onchange="PhoneStore.applyFilters()">
-                        <span>—</span>
-                        <input type="number" id="maxPrice" placeholder="Max" min="0" onchange="PhoneStore.applyFilters()">
-                    </div>
-                </div>
-
-                <div class="filter-block">
-                    <label>État du produit</label>
-                    <label class="check-row"><input type="checkbox" class="conditionFilter" value="Neuf" onchange="PhoneStore.applyFilters()"> <span>✨ Neuf</span></label>
-                    <label class="check-row"><input type="checkbox" class="conditionFilter" value="Comme neuf" onchange="PhoneStore.applyFilters()"> <span>⭐ Comme neuf</span></label>
-                    <label class="check-row"><input type="checkbox" class="conditionFilter" value="Bon état" onchange="PhoneStore.applyFilters()"> <span>👍 Bon état</span></label>
-                    <label class="check-row"><input type="checkbox" class="conditionFilter" value="Correct" onchange="PhoneStore.applyFilters()"> <span>👌 Correct</span></label>
-                </div>
-
-                <div class="filters-tip">
-                    💡 Astuce : utilisez la recherche pour trouver un modèle précis.
-                </div>
-            </aside>
-
-            <div class="catalog-main">
-                <div class="catalog-toolbar">
-                    <div class="catalog-count" id="resultsCount">0 téléphone disponible</div>
-                    <div class="catalog-tools">
-                        <div class="catalog-search-wrap">
-                            <span class="catalog-search-icon">🔍</span>
-                            <input type="search" id="searchInput" class="catalog-search" placeholder="Rechercher un téléphone...">
-                        </div>
-                        <select id="sortFilter" class="catalog-sort" onchange="PhoneStore.applyFilters()">
-                            <option value="recent">Plus récents</option>
-                            <option value="price-asc">Prix croissant</option>
-                            <option value="price-desc">Prix décroissant</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="catalog-grid" id="catalogGrid"></div>
-            </div>
+        <div class="footer-bottom">
+            &copy; 2026 <span>TCHATCHIBARA-WEB School</span> - Programme officiel du Gabon.
         </div>
-    </main>
+    </footer>
 
-    <!-- ============ VUE VENDRE ============ -->
-    <main id="view-vendre" class="view">
-        <div class="page-header">
-            <div class="page-header-inner">
-                <div class="page-header-left">
-                    <div class="page-header-eyebrow">💰 Vendre</div>
-                    <h1>Vendre un téléphone</h1>
-                    <p>Publiez votre annonce et gérez vos ventes depuis votre espace personnel.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="sell-layout">
-            <div class="sell-form-card">
-                <div class="card-head">
-                    <div class="card-head-icon">📝</div>
-                    <div>
-                        <h2>Publier une annonce</h2>
-                        <p>Remplissez les informations ci-dessous. Votre annonce sera visible immédiatement.</p>
-                    </div>
-                </div>
-
-                <form id="sellForm" onsubmit="PhoneStore.publishProduct(event)" novalidate>
-                    <div class="form-group">
-                        <label for="pTitle">Titre de l'annonce *</label>
-                        <input type="text" id="pTitle" required maxlength="100" placeholder="Ex : iPhone 14 Pro 256Go">
-                    </div>
-
-                    <div class="form-row-2">
-                        <div class="form-group">
-                            <label for="pBrand">Marque *</label>
-                            <select id="pBrand" required>
-                                <option value="">Choisir…</option>
-                                <option value="Apple"> Apple</option>
-                                <option value="Samsung">Samsung</option>
-                                <option value="Xiaomi">Xiaomi</option>
-                                <option value="Google">Google</option>
-                                <option value="OnePlus">OnePlus</option>
-                                <option value="Huawei">Huawei</option>
-                                <option value="Oppo">Oppo</option>
-                                <option value="Autre">Autre</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="pPrice">Prix (FCFA) *</label>
-                            <input type="number" id="pPrice" required min="1000" max="10000000" step="500" placeholder="350000">
-                        </div>
-                    </div>
-
-                    <div class="form-row-2">
-                        <div class="form-group">
-                            <label for="pCondition">État *</label>
-                            <select id="pCondition" required>
-                                <option value="Neuf">✨ Neuf</option>
-                                <option value="Comme neuf">⭐ Comme neuf</option>
-                                <option value="Bon état">👍 Bon état</option>
-                                <option value="Correct">👌 Correct</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="pLocation">Localisation *</label>
-                            <input type="text" id="pLocation" required maxlength="80" placeholder="Ex : Abidjan, Cocody">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pImage">Photo du téléphone</label>
-                        <label class="file-upload" for="pImage">
-                            <div class="file-upload-icon">📷</div>
-                            <div class="file-upload-text">
-                                <strong>Cliquez pour uploader</strong>
-                                <span>PNG, JPG jusqu'à 2 Mo</span>
-                            </div>
-                        </label>
-                        <input type="file" id="pImage" accept="image/*" onchange="PhoneStore.previewImage(event)" style="display:none">
-                        <div class="image-preview" id="imagePreview"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pDescription">Description</label>
-                        <textarea id="pDescription" maxlength="600" placeholder="Décrivez votre téléphone (accessoires, garantie, défauts éventuels...)"></textarea>
-                        <div class="form-hint">Max. 600 caractères</div>
-                    </div>
-
-                    <button type="submit" class="btn-primary full">
-                        <span>📤 Publier l'annonce</span>
-                    </button>
-                </form>
-            </div>
-
-            <div class="my-listings-card">
-                <div class="card-head">
-                    <div class="card-head-icon">📦</div>
-                    <div>
-                        <h2>Mes annonces</h2>
-                        <p>Gérez vos annonces actives ci-dessous.</p>
-                    </div>
-                </div>
-                <div class="my-listings" id="myListings"></div>
-            </div>
-        </div>
-    </main>
-
-    <!-- ============ VUE FAVORIS ============ -->
-    <main id="view-favoris" class="view">
-        <div class="page-header">
-            <div class="page-header-inner">
-                <div class="page-header-left">
-                    <div class="page-header-eyebrow">❤️ Favoris</div>
-                    <h1>Mes favoris</h1>
-                    <p>Retrouvez les téléphones que vous avez sauvegardés.</p>
-                </div>
-            </div>
-        </div>
-        <div class="container-simple">
-            <div class="catalog-grid" id="favGrid"></div>
-        </div>
-    </main>
-
-    <!-- ============ VUE MESSAGES ============ -->
-    <main id="view-messages" class="view">
-        <div class="messenger-wrap">
-            <aside class="conv-panel">
-                <div class="conv-head">
-                    <h2>💬 Messages</h2>
-                    <span class="conv-count" id="convCount"></span>
-                </div>
-                <div class="conv-search">
-                    <span class="conv-search-icon">🔍</span>
-                    <input type="search" id="convSearch" placeholder="Rechercher une conversation...">
-                </div>
-                <div class="conv-list" id="convList"></div>
-            </aside>
-
-            <section class="chat-panel">
-                <div class="chat-header">
-                    <div class="chat-user">
-                        <div class="chat-avatar" id="chatAvatar">?</div>
-                        <div>
-                            <strong id="chatName">Sélectionnez une conversation</strong>
-                            <span id="chatStatus">—</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chat-body" id="chatBody">
-                    <div class="chat-empty">
-                        <div class="chat-empty-icon">💬</div>
-                        <p>Choisissez une conversation pour commencer</p>
-                    </div>
-                </div>
-
-                <form class="chat-input-bar" id="chatForm" onsubmit="PhoneStore.sendMessage(event)">
-                    <input type="text" id="chatInput" placeholder="Écrivez votre message..." maxlength="500" autocomplete="off" disabled>
-                    <button type="submit" class="btn-send" id="sendBtn" disabled>➤</button>
-                </form>
-            </section>
-        </div>
-    </main>
-
-    <!-- ============ VUE NOTIFICATIONS ============ -->
-    <main id="view-notifications" class="view">
-        <div class="page-header">
-            <div class="page-header-inner">
-                <div class="page-header-left">
-                    <div class="page-header-eyebrow">🔔 Notifications</div>
-                    <h1>Mes notifications</h1>
-                    <p>Restez informé de l'actualité de votre compte.</p>
-                </div>
-            </div>
-        </div>
-        <div class="container-simple">
-            <div class="notifs-list" id="notifsList"></div>
-        </div>
-    </main>
-
-    <!-- ============ VUE COMPTE ============ -->
-    <main id="view-compte" class="view">
-        <div class="page-header">
-            <div class="page-header-inner">
-                <div class="page-header-left">
-                    <div class="page-header-eyebrow">👤 Compte</div>
-                    <h1>Mon compte</h1>
-                    <p>Gérez vos informations personnelles et vos préférences.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="account-layout">
-            <div class="account-profile">
-                <div class="profile-banner"></div>
-                <div class="profile-avatar" id="profileAvatar">?</div>
-                <h2 id="profileName">—</h2>
-                <p id="profileEmail">—</p>
-                <span class="profile-role-badge" id="profileRole">—</span>
-                <div id="verifiedBadge"></div>
-                <button class="btn-outline full" style="margin-top:20px" onclick="PhoneStore.logout()">
-                    <span>🚪</span> Se déconnecter
-                </button>
-            </div>
-
-            <div class="account-content">
-                <div class="account-card">
-                    <div class="account-card-head">
-                        <div class="account-card-icon">📋</div>
-                        <h3>Informations personnelles</h3>
-                    </div>
-                    <div class="info-row"><span>Nom complet</span><strong id="infoName">—</strong></div>
-                    <div class="info-row"><span>Email</span><strong id="infoEmail">—</strong></div>
-                    <div class="info-row"><span>Téléphone</span><strong id="infoPhone">—</strong></div>
-                    <div class="info-row"><span>Membre depuis</span><strong id="infoSince">—</strong></div>
-                </div>
-
-                <div class="account-card">
-                    <div class="account-card-head">
-                        <div class="account-card-icon">📊</div>
-                        <h3>Mes statistiques</h3>
-                    </div>
-                    <div class="stats-grid-mini">
-                        <div class="stat-mini">
-                            <div class="stat-mini-icon">📦</div>
-                            <div class="stat-mini-value" id="statListings">0</div>
-                            <div class="stat-mini-label">Annonces</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-icon">💬</div>
-                            <div class="stat-mini-value" id="statMessages">0</div>
-                            <div class="stat-mini-label">Messages</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-icon">❤️</div>
-                            <div class="stat-mini-value" id="statFavorites">0</div>
-                            <div class="stat-mini-label">Favoris</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="account-card">
-                    <div class="account-card-head">
-                        <div class="account-card-icon">⚙️</div>
-                        <h3>Préférences</h3>
-                    </div>
-                    <label class="pref-row">
-                        <span class="pref-label">
-                            <span class="pref-icon">🌙</span>
-                            <span>
-                                <strong>Mode sombre</strong>
-                                <span>Activer le thème sombre</span>
-                            </span>
-                        </span>
-                        <input type="checkbox" id="darkModeToggle" class="switch" onchange="PhoneStore.toggleTheme()">
-                    </label>
-                    <label class="pref-row">
-                        <span class="pref-label">
-                            <span class="pref-icon">🔔</span>
-                            <span>
-                                <strong>Notifications push</strong>
-                                <span>Recevoir les alertes en direct</span>
-                            </span>
-                        </span>
-                        <input type="checkbox" id="pushToggle" class="switch" checked>
-                    </label>
-                    <label class="pref-row">
-                        <span class="pref-label">
-                            <span class="pref-icon">📧</span>
-                            <span>
-                                <strong>Emails marketing</strong>
-                                <span>Offres et nouveautés</span>
-                            </span>
-                        </span>
-                        <input type="checkbox" id="emailToggle" class="switch">
-                    </label>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- ============ AUTH MODAL ============ -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-modal">
-            <button class="auth-close" onclick="PhoneStore.closeAuth()">&times;</button>
-
-            <div class="auth-hero">
-                <div class="auth-hero-logo">
-                    <span class="logo-mark"><span class="logo-mark-inner">PS</span></span>
-                </div>
-                <h1>Phone Store</h1>
-                <p>La plateforme pro des téléphones</p>
-            </div>
-
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login" onclick="PhoneStore.switchAuthTab('login')">Connexion</button>
-                <button class="auth-tab" data-tab="register" onclick="PhoneStore.switchAuthTab('register')">Inscription</button>
-            </div>
-
-            <form class="auth-form active" id="loginForm" onsubmit="PhoneStore.handleLogin(event)" novalidate>
-                <h2>Bon retour 👋</h2>
-                <p class="auth-sub">Connectez-vous pour accéder à votre espace.</p>
-
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">📧</span>
-                        <input type="email" id="loginEmail" required maxlength="120" placeholder="vous@exemple.com" autocomplete="email">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Mot de passe</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">🔒</span>
-                        <input type="password" id="loginPassword" required minlength="6" maxlength="60" placeholder="••••••••" autocomplete="current-password">
-                    </div>
-                </div>
-
-                <div style="text-align:right;margin-bottom:14px;">
-                    <a href="#" onclick="PhoneStore.resetPassword(event);return false;" class="forgot-link">Mot de passe oublié ?</a>
-                </div>
-
-                <button type="submit" class="btn-primary full">Se connecter</button>
-                <p class="auth-switch">Pas encore de compte ? <a href="#" onclick="PhoneStore.switchAuthTab('register');return false;">S'inscrire</a></p>
-            </form>
-
-            <form class="auth-form" id="registerForm" onsubmit="PhoneStore.handleRegister(event)" novalidate>
-                <h2>Créer un compte</h2>
-                <p class="auth-sub">Rejoignez Phone Store gratuitement en 60 secondes.</p>
-
-                <div class="form-group">
-                    <label for="regName">Nom complet</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">👤</span>
-                        <input type="text" id="regName" required maxlength="80" placeholder="Votre nom et prénom" autocomplete="name">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="regEmail">Email</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">📧</span>
-                        <input type="email" id="regEmail" required maxlength="120" placeholder="vous@exemple.com" autocomplete="email">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="regPhone">Téléphone</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">📱</span>
-                        <input type="tel" id="regPhone" required maxlength="20" placeholder="+225 07 00 00 00 00" autocomplete="tel">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">Mot de passe</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">🔒</span>
-                        <input type="password" id="regPassword" required minlength="6" maxlength="60" placeholder="6 caractères minimum" autocomplete="new-password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="regRole">Je souhaite</label>
-                    <select id="regRole" required>
-                        <option value="client">🛒 Acheter des téléphones</option>
-                        <option value="vendeur">💰 Vendre des téléphones</option>
-                        <option value="both">🌟 Les deux</option>
-                    </select>
-                </div>
-
-                <label class="check-row auth-terms">
-                    <input type="checkbox" id="regTerms" required>
-                    <span>J'accepte les <a href="#" onclick="event.preventDefault()">conditions d'utilisation</a> et la <a href="#" onclick="event.preventDefault()">politique de confidentialité</a>.</span>
-                </label>
-
-                <button type="submit" class="btn-primary full">Créer mon compte</button>
-                <p class="auth-switch">Déjà inscrit ? <a href="#" onclick="PhoneStore.switchAuthTab('login');return false;">Se connecter</a></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- ============ PAYMENT MODAL ============ -->
-    <div class="auth-overlay" id="paymentOverlay">
-        <div class="auth-modal">
-            <button class="auth-close" onclick="PhoneStore.closePayment()">&times;</button>
-            <h2>💳 Confirmer l'achat</h2>
-            <p class="auth-sub" id="paymentSubtitle">—</p>
-
-            <div class="payment-summary" id="paymentSummary"></div>
-
-            <div class="payment-methods">
-                <label class="pay-method">
-                    <input type="radio" name="payMethod" value="orange" checked>
-                    <span class="pay-logo" style="background:#ff7900;">OM</span>
-                    <span class="pay-name">Orange Money</span>
-                </label>
-                <label class="pay-method">
-                    <input type="radio" name="payMethod" value="mtn">
-                    <span class="pay-logo" style="background:#ffcb05;color:#000;">MTN</span>
-                    <span class="pay-name">MTN Mobile Money</span>
-                </label>
-                <label class="pay-method">
-                    <input type="radio" name="payMethod" value="wave">
-                    <span class="pay-logo" style="background:#1dc4ff;">W</span>
-                    <span class="pay-name">Wave</span>
-                </label>
-                <label class="pay-method">
-                    <input type="radio" name="payMethod" value="card">
-                    <span class="pay-logo" style="background:#0b1f3a;">💳</span>
-                    <span class="pay-name">Carte bancaire</span>
-                </label>
-            </div>
-
-            <button class="btn-primary full" onclick="PhoneStore.confirmPayment()" style="margin-top:20px;">
-                🔒 Payer maintenant
-            </button>
-            <p class="payment-secure">Transaction sécurisée · Remboursement 30 jours</p>
-        </div>
-    </div>
-
-    <!-- ============ TOAST ============ -->
-    <div class="toast" id="toast"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js"></script>
-    <script src="script.js" defer></script>
 </body>
 </html>
