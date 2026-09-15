@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercices & Explications - TCHATCHIBARA-WEB School</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                TCHATCHIBARA-WEB<span>School</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="index.html#classes">Classes</a></li>
+                <li><a href="bac.html">Baccalauréat</a></li>
+                <li><a href="exercices.html" class="active">Exercices</a></li>
+                <li><a href="#" class="btn-connexion">Connexion</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero hero-small">
+        <h1>Exercices <span>Rédigés & Expliqués</span></h1>
+        <p>Des exercices variés avec solutions détaillées, conformes au programme gabonais de la 6ème à la Terminale.</p>
+    </section>
+
+    <section class="exercices-section">
+        <h2 class="section-title">Mathématiques</h2>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 3ème - Théorème de Thalès <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Dans un triangle ABC, M ∈ [AB] et N ∈ [AC] tels que (MN) // (BC). On donne AM = 3 cm, AB = 7,5 cm et MN = 4 cm. Calculer BC.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                D'après le théorème de Thalès : AM/AB = AN/AC = MN/BC.<br>
+                Donc 3/7,5 = 4/BC → BC = (4 × 7,5)/3 = 10 cm.<br>
+                <em>Explication :</em> Le théorème de Thalès permet de calculer des longueurs dans une configuration de droites parallèles.
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 2nde C - Équations du second degré <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Résoudre dans ℝ : x² - 5x + 6 = 0.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                Δ = b² - 4ac = 25 - 24 = 1 > 0.<br>
+                x₁ = (5-1)/2 = 2 ; x₂ = (5+1)/2 = 3.<br>
+                S = {2 ; 3}.<br>
+                <em>Explication :</em> On utilise le discriminant Δ pour déterminer le nombre de solutions.
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 1ère C - Dérivées <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Calculer la dérivée de f(x) = (3x² + 1)/(x - 2).
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                f'(x) = [(6x)(x-2) - (3x²+1)(1)]/(x-2)²<br>
+                = (6x² - 12x - 3x² - 1)/(x-2)²<br>
+                = (3x² - 12x - 1)/(x-2)².<br>
+                <em>Explication :</em> On applique la formule (u/v)' = (u'v - uv')/v².
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> Terminale D - Intégrales <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Calculer ∫₀¹ (2x + 1) dx.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                ∫₀¹ (2x + 1) dx = [x² + x]₀¹ = (1 + 1) - (0 + 0) = 2.<br>
+                <em>Explication :</em> On cherche une primitive puis on applique la formule de Newton-Leibniz.
+            </div>
+        </div>
+
+        <h2 class="section-title">Physique-Chimie</h2>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 3ème - Loi d'Ohm <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Un conducteur ohmique de résistance R = 50 Ω est traversé par un courant I = 0,2 A. Calculer la tension U.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong> U = R × I = 50 × 0,2 = 10 V.<br>
+                <em>Explication :</em> La loi d'Ohm relie tension, intensité et résistance : U = R·I.
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 1ère C - Mouvement rectiligne <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Un mobile parcourt 200 m en 10 s. Calculer sa vitesse moyenne en m/s et km/h.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong> v = d/t = 200/10 = 20 m/s = 20 × 3,6 = 72 km/h.<br>
+                <em>Explication :</em> Pour convertir m/s en km/h, on multiplie par 3,6.
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> Terminale C - Chimie organique <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Identifier la formule semi-développée du butane et donner sa formule brute.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                Butane : CH₃ - CH₂ - CH₂ - CH₃.<br>
+                Formule brute : C₄H₁₀.<br>
+                <em>Explication :</em> Les alcanes suivent la formule CₙH₂ₙ₊₂.
+            </div>
+        </div>
+
+        <h2 class="section-title">SVT</h2>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> Terminale D - Génétique <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Expliquez le mécanisme de la transmission de l'information génétique lors de la méiose.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                La méiose comporte deux divisions :<br>
+                - 1ère division : séparation des chromosomes homologues (brassage interchromosomique).<br>
+                - 2ème division : séparation des chromatides sœurs (brassage intrachromosomique).<br>
+                <em>Explication :</em> Ces brassages assurent la diversité génétique des gamètes.
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 2nde - La cellule <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Citez les principaux organites d'une cellule eucaryote et leur rôle.
+            </div>
+            <div class="solution">
+                <strong>Solution :</strong><br>
+                - Noyau : contient l'ADN.<br>
+                - Mitochondrie : production d'énergie.<br>
+                - Réticulum endoplasmique : synthèse des protéines.<br>
+                - Appareil de Golgi : maturation des protéines.<br>
+                - Chloroplaste (végétaux) : photosynthèse.
+            </div>
+        </div>
+
+        <h2 class="section-title">Français</h2>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> 1ère A1 - Commentaire composé <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> Faites le commentaire composé du poème "Le Lac" de Lamartine.
+            </div>
+            <div class="solution">
+                <strong>Pistes de correction :</strong><br>
+                1. Introduction : présentation de l'auteur, du poème, problématique.<br>
+                2. Axe 1 : La fuite du temps et la méditation sur la nature.<br>
+                3. Axe 2 : L'expression lyrique de la souffrance amoureuse.<br>
+                4. Conclusion : synthèse et ouverture sur le romantisme.<br>
+                <em>Explication :</em> Le commentaire doit suivre une structure claire avec citations précises.
+            </div>
+        </div>
+
+        <div class="exercice-item">
+            <h4><i class="fas fa-pencil-alt"></i> Terminale A1 - Dissertation <span class="badge">Corrigé</span></h4>
+            <div class="enonce">
+                <strong>Énoncé :</strong> "La littérature africaine est-elle engagée ?" Discutez.
+            </div>
+            <div class="solution">
+                <strong>Pistes de correction :</strong><br>
+                I. Thèse : oui, la littérature africaine est engagée (Césaire, Senghor, Soyinka).<br>
+                II. Antithèse : certaines œuvres privilégient l'esthétique.<br>
+                III. Synthèse : engagement et esthétique peuvent coexister.<br>
+                Conclusion : la littérature africaine reflète les réalités sociales et politiques.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>TCHATCHIBARA-WEB School</h4>
+                <p>Plateforme éducative gabonaise dédiée aux élèves du secondaire.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="index.html#classes">Classes</a></li>
+                    <li><a href="bac.html">Baccalauréat</a></li>
+                    <li><a href="exercices.html">Exercices</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> contact@tchatchibara-web.ga</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Libreville, Gabon</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 <span>TCHATCHIBARA-WEB School</span> - Tous droits réservés.
+        </div>
+    </footer>
+
+</body>
+      </html>
